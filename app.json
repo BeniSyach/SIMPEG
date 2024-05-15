@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "react-native-boilerplate",
+    "slug": "react-native-boilerplate",
+    "owner": "wataru",
+    "privacy": "unlisted",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "orientation": "portrait",
+    "icon": "./assets/images/logo-lg.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/logo-sm.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/images/logo-sm.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b37731ed-a597-46c8-b3a8-701dba47ea7e"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b37731ed-a597-46c8-b3a8-701dba47ea7e"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
