@@ -6,6 +6,7 @@ import { StackHeaderLeft, StackHeaderTitle } from './components';
 import { colors } from '@theme';
 
 // views
+import Login from '@views/Login';
 import Home from '@views/Home';
 import Details from '@views/Details';
 import Profile from '@views/Profile';
@@ -18,7 +19,21 @@ const navigationProps = {
   headerTitleStyle: { fontSize: 18 },
 };
 
-export function HomeStackNavigator({ navigation }: DrawerProps) {
+export function LoginStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={navigationProps}>
+      <Stack.Screen
+        component={Login}
+        name="LoginStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export function HomeStackNavigator() {
   return (
     <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
@@ -27,7 +42,7 @@ export function HomeStackNavigator({ navigation }: DrawerProps) {
         options={{
           title: 'Home',
           headerTitle: () => <StackHeaderTitle />,
-          headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
+          // headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
           headerTitleAlign: 'center',
         }}
       />
@@ -44,7 +59,7 @@ export function HomeStackNavigator({ navigation }: DrawerProps) {
   );
 }
 
-export function ProfileStackNavigator({ navigation }: DrawerProps) {
+export function ProfileStackNavigator() {
   return (
     <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
@@ -53,7 +68,7 @@ export function ProfileStackNavigator({ navigation }: DrawerProps) {
         options={{
           title: 'Profile',
           headerTitle: () => <StackHeaderTitle />,
-          headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
+          // headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
           headerTitleAlign: 'center',
         }}
       />

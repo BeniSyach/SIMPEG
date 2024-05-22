@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "react-native-boilerplate",
-    "slug": "react-native-boilerplate",
-    "owner": "wataru",
+    "name": "SIMPEG",
+    "slug": "SIMPEG",
+    "owner": "benisyach",
     "privacy": "unlisted",
     "version": "1.0.0",
     "platforms": [
@@ -35,11 +35,11 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b37731ed-a597-46c8-b3a8-701dba47ea7e"
+        "projectId": "45fa858b-00ae-497b-b627-eb7f82e6cfde"
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/b37731ed-a597-46c8-b3a8-701dba47ea7e"
+      "url": "https://u.expo.dev/45fa858b-00ae-497b-b627-eb7f82e6cfde"
     },
     "runtimeVersion": {
       "policy": "sdkVersion"
