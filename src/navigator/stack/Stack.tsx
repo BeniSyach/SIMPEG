@@ -55,6 +55,13 @@ export function HomeStackNavigator() {
           headerTitleAlign: 'center',
         }}
       />
+      <Stack.Screen
+        component={Login}
+        name="LoginStack"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -79,6 +86,13 @@ export function ProfileStackNavigator() {
           title: 'Details',
           headerTitle: () => <StackHeaderTitle />,
           headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        component={Login}
+        name="LoginStack"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

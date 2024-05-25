@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...config.extra,
       eas: { projectId: '45fa858b-00ae-497b-b627-eb7f82e6cfde' },
       ENV: 'production',
-      API_URL: 'http://103.109.172.90:3000',
+      API_URL: 'http://103.109.172.90:7273',
     },
   };
   return envConfig;

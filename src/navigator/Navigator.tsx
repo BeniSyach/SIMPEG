@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAppSlice, useAppService, IUser } from '@modules/app';
@@ -18,9 +17,9 @@ SplashScreen.preventAutoHideAsync();
 function Navigator() {
   const { getUser } = useAppService();
   const { dispatch, checked, loggedIn, setUser, setLoggedIn } = useAppSlice();
-  const { setPersistData, getPersistData } = useDataPersist();
-
+  const { getPersistData } = useDataPersist();
   const [isOpen, setOpen] = useState(true);
+  const [isReady, setReady] = useState(false);
 
   /**
    * preload assets and user data
@@ -30,33 +29,25 @@ function Navigator() {
       // preload assets
       await Promise.all([loadImages(), loadFonts()]);
 
-      // fetch user data (fake promise function to simulate async function)
-      const user = await getUser();
-
-      // store user data to redux
-      dispatch(setUser(user));
-      dispatch(setLoggedIn(!!user));
-
-      // store user data to persistent storage (async storage)
-      if (user) setPersistData<IUser>(DataPersistKeys.USER, user);
+      // fetch user data from persistent storage
+      const storedUser = await getPersistData<IUser>(DataPersistKeys.USER);
+      if (storedUser) {
+        dispatch(setUser(storedUser));
+        dispatch(setLoggedIn(!!storedUser));
+      } else {
+        dispatch(setLoggedIn(false));
+      }
 
       // hide splash screen
       SplashScreen.hideAsync();
     } catch (err) {
       console.log('[##] preload error:', err);
+      dispatch(setLoggedIn(false));
 
-      // if preload failed, try to get user data from persistent storage
-      getPersistData<IUser>(DataPersistKeys.USER)
-        .then(user => {
-          if (user) {
-            dispatch(setUser(user));
-            dispatch(setLoggedIn(!!user));
-          }
-        })
-        .finally(() => {
-          // hide splash screen
-          SplashScreen.hideAsync();
-        });
+      // hide splash screen
+      SplashScreen.hideAsync();
+    } finally {
+      setReady(true);
     }
   };
 
@@ -64,24 +55,25 @@ function Navigator() {
     preload();
   }, []);
 
-  // TODO: switch router by loggedIn status
-  console.log('[##] loggedIn', loggedIn);
-
-  return checked && loggedIn ? (
-    <>
-      <NavigationContainer>
-        {/* <DrawerNavigator /> */}
-        <TabNavigator />
-      </NavigationContainer>
-      {/* {!isWeb && (
-        <BottomSheet isOpen={isOpen} initialOpen>
-          <WelcomeBottomSheetContents onClose={() => setOpen(false)} />
-        </BottomSheet>
-      )} */}
-    </>
-  ) : (
+  if (!isReady) {
+    return null; // or a loading indicator
+  }
+  console.log('## loggedIn', loggedIn);
+  console.log('## checked', checked);
+  return (
     <NavigationContainer>
-      <LoginStackNavigator />
+      {checked && loggedIn ? (
+        <>
+          <TabNavigator />
+          {/* {!isWeb && (
+            <BottomSheet isOpen={isOpen} initialOpen>
+              <WelcomeBottomSheetContents onClose={() => setOpen(false)} />
+            </BottomSheet>
+          )} */}
+        </>
+      ) : (
+        <LoginStackNavigator />
+      )}
     </NavigationContainer>
   );
 }
