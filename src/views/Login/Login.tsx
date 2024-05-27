@@ -4,6 +4,7 @@ import { useAppService, useAppSlice } from '@modules/app';
 import Button from '@components/Button';
 import FormInput from '@components/FormInput';
 import config from '@utils/config';
+import { useDataPersist, DataPersistKeys } from '@hooks';
 
 const styles = StyleSheet.create({
   container: {
@@ -40,8 +41,9 @@ const Login = () => {
   const [nikError, setNikError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { dispatch, setUser, setLoggedIn, reset } = useAppSlice();
+  const { setPersistData } = useDataPersist();
 
-  const { getUser } = useAppService();
+  const { login } = useAppService();
 
   const handleLogin = async () => {
     let valid = true;
@@ -64,11 +66,18 @@ const Login = () => {
 
     if (valid) {
       try {
-        const user = await getUser(nik, password);
+        const user = await login(nik, password);
+        console.log('data', user);
         if (user) {
           dispatch(setUser(user));
           dispatch(setLoggedIn(true));
-          Alert.alert('Login Successful', `Welcome, ${user.name}`);
+          const success = await setPersistData(DataPersistKeys.USER, user);
+          if (success) {
+            console.log('Data pengguna berhasil disimpan.');
+          } else {
+            console.error('Gagal menyimpan data pengguna.');
+          }
+          Alert.alert('Login Successful', `Welcome`);
         } else {
           dispatch(reset());
           Alert.alert('Login Failed', 'NIK/NIP atau Password Salah');

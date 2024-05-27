@@ -3,15 +3,16 @@ import axios from 'axios';
 import config from '@utils/config';
 
 export function useAppService() {
-  /**
-   * function to get user data from API
-   */
-  async function getUser(nik: string, password: string): Promise<IUser | null> {
+  async function login(nik: string, password: string): Promise<IUser | null> {
     try {
+      const identity = parseInt(nik, 10);
+      if (isNaN(identity)) {
+        throw new Error('NIK harus berupa angka yang valid');
+      }
       const response = await axios.post(
         `${config.API_URL}/api/auth/login`,
         {
-          identity: nik,
+          identity,
           password,
         },
         {
@@ -28,8 +29,12 @@ export function useAppService() {
       const data = response.data;
 
       // Assuming the API returns user data on successful login
-      if (data?.user) {
-        return data.user;
+      if (data) {
+        return {
+          user: data,
+          nik,
+          password,
+        };
       }
 
       return null;
@@ -38,6 +43,5 @@ export function useAppService() {
       return Promise.reject(err);
     }
   }
-
-  return { getUser };
+  return { login };
 }

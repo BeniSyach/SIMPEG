@@ -1,6 +1,7 @@
 export interface IUser {
-  name: string;
-  email: string;
+  nik: string;
+  password: string;
+  user?: [];
 }
 
 export interface IAppState {

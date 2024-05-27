@@ -40,13 +40,13 @@ export default function Home({ navigation }: StackProps) {
   const handleLogout = async () => {
     try {
       // Hapus data pengguna dari penyimpanan persisten
-      await removePersistData(DataPersistKeys.USER);
+      // await removePersistData(DataPersistKeys.USER);
 
       // Reset status login dan hapus data pengguna dari store Redux
       dispatch(reset());
 
       // Navigasikan pengguna kembali ke layar login
-      navigation.replace('LoginStack');
+      // navigation.replace('LoginStack');
     } catch (error) {
       console.log('Logout error:', error);
     }

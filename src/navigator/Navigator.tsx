@@ -15,8 +15,8 @@ import { LoginStackNavigator } from './stack';
 SplashScreen.preventAutoHideAsync();
 
 function Navigator() {
-  const { getUser } = useAppService();
-  const { dispatch, checked, loggedIn, setUser, setLoggedIn } = useAppSlice();
+  const { login } = useAppService();
+  const { dispatch, checked, loggedIn, setUser, setLoggedIn, user } = useAppSlice();
   const { getPersistData } = useDataPersist();
   const [isOpen, setOpen] = useState(true);
   const [isReady, setReady] = useState(false);
@@ -30,10 +30,18 @@ function Navigator() {
       await Promise.all([loadImages(), loadFonts()]);
 
       // fetch user data from persistent storage
-      const storedUser = await getPersistData<IUser>(DataPersistKeys.USER);
+      const data_user = await getPersistData<IUser>(DataPersistKeys.USER);
+      if (data_user) {
+        console.log('User data found:', data_user);
+      } else {
+        console.log('User data not found.');
+      }
+
+      const storedUser = await login(data_user?.nik || '', data_user?.password || '');
+      console.log('Stored user data:', storedUser);
       if (storedUser) {
         dispatch(setUser(storedUser));
-        dispatch(setLoggedIn(!!storedUser));
+        dispatch(setLoggedIn(true));
       } else {
         dispatch(setLoggedIn(false));
       }
