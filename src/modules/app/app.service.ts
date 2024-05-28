@@ -30,11 +30,7 @@ export function useAppService() {
 
       // Assuming the API returns user data on successful login
       if (data) {
-        return {
-          user: data,
-          nik,
-          password,
-        };
+        return data;
       }
 
       return null;

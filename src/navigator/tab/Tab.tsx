@@ -12,7 +12,7 @@ const renderTabBarIcon = (tabName: keyof TabParamList) => (tabStatus: TabBarStat
     case 'HomeTab':
       return <AntDesign name="home" size={24} color={tabStatus.color} />;
     case 'ProfileTab':
-      return <AntDesign name="profile" size={24} color={tabStatus.color} />;
+      return <AntDesign name="user" size={24} color={tabStatus.color} />;
     // add more...
   }
 };
@@ -24,9 +24,9 @@ export default function TabNavigator() {
         tabBarIcon: renderTabBarIcon(route.name),
         headerShown: false,
         tabBarInactiveTintColor: colors.gray,
-        tabBarInactiveBackgroundColor: colors.white,
-        tabBarActiveTintColor: colors.lightPurple,
-        tabBarActiveBackgroundColor: colors.white,
+        tabBarInactiveBackgroundColor: '#39378A',
+        tabBarActiveTintColor: colors.white,
+        tabBarActiveBackgroundColor: '#39378A',
       })}>
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Home' }} />
       <Tab.Screen

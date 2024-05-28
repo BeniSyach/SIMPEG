@@ -39,11 +39,14 @@ export function HomeStackNavigator() {
       <Stack.Screen
         component={Home}
         name="HomeStack"
+        // options={{
+        //   title: 'Home',
+        //   headerTitle: () => <StackHeaderTitle />,
+        //   // headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
+        //   headerTitleAlign: 'center',
+        // }}
         options={{
-          title: 'Home',
-          headerTitle: () => <StackHeaderTitle />,
-          // headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
-          headerTitleAlign: 'center',
+          headerShown: false,
         }}
       />
       <Stack.Screen

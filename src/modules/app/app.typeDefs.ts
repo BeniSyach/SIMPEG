@@ -1,7 +1,8 @@
 export interface IUser {
   nik: string;
   password: string;
-  user?: [];
+  access_token: string;
+  // Tambahkan properti lain yang relevan
 }
 
 export interface IAppState {
