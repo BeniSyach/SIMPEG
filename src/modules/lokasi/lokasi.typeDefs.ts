@@ -1,6 +1,5 @@
-export interface IUser {
-  nik: string;
-  password: string;
+export interface IUlokasi {
+  lokasi: string;
   access_token: string;
   data: {
     email: string;
@@ -12,8 +11,6 @@ export interface IUser {
   // Tambahkan properti lain yang relevan
 }
 
-export interface IAppState {
-  checked: boolean;
-  loggedIn: boolean;
-  user?: IUser;
+export interface LokasiState {
+  lokasi?: IUlokasi;
 }

@@ -79,7 +79,7 @@ export function WelcomeBottomSheetContents({ onClose }: WelcomeBottomSheetConten
       {Object.keys(config).map(key => (
         <View key={key} style={styles.envContainer}>
           <Text style={styles.envTitle}>{`✅ ${key}: `}</Text>
-          <Text style={styles.envValue}>{config[key] ?? ''}</Text>
+          {/* <Text style={styles.envValue}>{config[key] ?? ''}</Text> */}
         </View>
       ))}
       <Text style={[styles.subtitle, { marginVertical: 32 }]}>

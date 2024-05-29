@@ -4,8 +4,6 @@ import { StackProps } from '@navigator/stack';
 import { images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser, useAppSlice } from '@modules/app';
-import axios from 'axios';
-import config from '@utils/config';
 
 const styles = StyleSheet.create({
   container: {
@@ -147,66 +145,29 @@ const styles = StyleSheet.create({
   },
 });
 
-interface Service {
-  id: number;
-  name: string;
-  icon: string;
-}
-
 export default function Home({ navigation }: StackProps) {
-  const { removeAllPersistData } = useDataPersist();
-  const { dispatch, reset, setUser, user } = useAppSlice();
+  const { getPersistData } = useDataPersist();
+  const { user } = useAppSlice();
   const [isReady, setReady] = useState(false);
-  const [nama, setNama] = useState<string | undefined>();
-  const [unit, setUnit] = useState<string | undefined>();
 
-  const preload = async () => {
+  const preloadHome = async () => {
     try {
-      console.log('data token', user?.access_token);
-      if (user) {
-        const response = await axios.post(
-          `${config.API_URL}/api/lokasi`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${user.access_token}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-
-        const data = response.data;
-        console.log('data lokasi', data);
-        dispatch(setUser(data));
-        setNama(data?.data?.nama);
-        setUnit(data?.data?.unit_kerja);
+      const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+      if (token) {
+        console.log('User Token found:', token);
+      } else {
+        console.log('Token not found.');
       }
     } catch (err) {
-      console.log('[##] preload error:', err);
+      console.log('[##] preload error Home:', err);
       // hide splash screen
     } finally {
       setReady(true);
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      // Hapus data pengguna dari penyimpanan persisten
-      const hapusDataLogin = await removeAllPersistData();
-      if (hapusDataLogin) {
-        console.log('Berhasil megnhapus data pengguna.');
-        // Reset status login dan hapus data pengguna dari store Redux
-        dispatch(reset());
-      } else {
-        console.error('Gagal megnhapus data pengguna.');
-      }
-    } catch (error) {
-      console.log('Logout error:', error);
-    }
-  };
-
   useEffect(() => {
-    preload();
+    preloadHome();
   }, []);
 
   if (!isReady) {
@@ -224,8 +185,8 @@ export default function Home({ navigation }: StackProps) {
         </View>
         <View style={{ marginHorizontal: 5 }}>
           <Text style={styles.welcomeText}>Halo, Selamat Datang</Text>
-          <Text style={styles.userName}>{nama}</Text>
-          <Text style={styles.userPosition}>{unit}</Text>
+          <Text style={styles.userName}>{user?.data.nama}</Text>
+          <Text style={styles.userPosition}>{user?.data.nik}</Text>
         </View>
         <View style={{ flexDirection: 'row-reverse' }}>
           <Image source={images.lonceng} style={styles.logo_lonceng} />

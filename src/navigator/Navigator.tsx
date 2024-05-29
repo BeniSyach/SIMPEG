@@ -13,7 +13,7 @@ SplashScreen.preventAutoHideAsync();
 function Navigator() {
   const { login } = useAppService();
   const { dispatch, checked, loggedIn, setUser, setLoggedIn } = useAppSlice();
-  const { getPersistData } = useDataPersist();
+  const { getPersistData, setPersistData } = useDataPersist();
   const [isReady, setReady] = useState(false);
 
   /**
@@ -35,8 +35,14 @@ function Navigator() {
       const storedUser = await login(data_user?.nik || '', data_user?.password || '');
       console.log('Stored user data:', storedUser);
       if (storedUser) {
-        dispatch(setUser(storedUser));
-        dispatch(setLoggedIn(true));
+        const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, storedUser);
+        if (SimpanToken) {
+          console.log('Data pengguna berhasil disimpan.');
+          dispatch(setUser(storedUser));
+          dispatch(setLoggedIn(true));
+        } else {
+          console.error('token tidak ada');
+        }
       } else {
         dispatch(setLoggedIn(false));
       }

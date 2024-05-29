@@ -67,13 +67,21 @@ const Login = () => {
     if (valid) {
       try {
         const user = await login(nik, password);
-        console.log('data', user);
+        // console.log('data', user);
         if (user) {
           dispatch(setUser(user));
           dispatch(setLoggedIn(true));
-          const success = await setPersistData(DataPersistKeys.USER, user);
+          const dataLogin = {
+            user,
+            nik,
+            password,
+          };
+          const success = await setPersistData(DataPersistKeys.USER, dataLogin);
           if (success) {
-            console.log('Data pengguna berhasil disimpan.');
+            const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, user);
+            if (SimpanToken) {
+              console.log('Data pengguna berhasil disimpan.');
+            }
           } else {
             console.error('Gagal menyimpan data pengguna.');
           }
