@@ -10,12 +10,18 @@ export function useLokasiService() {
         {},
         {
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         },
       );
 
-      return response.data as IUlokasi;
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      return null;
     } catch (error) {
       console.error('[##] getlokasi error:', error);
       return null;

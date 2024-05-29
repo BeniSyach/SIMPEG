@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
 import { StackProps } from '@navigator/stack';
 import { images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
@@ -175,6 +183,7 @@ export default function Home({ navigation }: StackProps) {
   }
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
       <View style={styles.header}>
         <Image source={images.logo_sm} style={styles.logo} />
         <Text style={styles.headerTitle}>SIMPEG SEHAT</Text>

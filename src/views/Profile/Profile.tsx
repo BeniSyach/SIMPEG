@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import Button from '@components/Button';
 import { StackProps } from '@navigator/stack';
@@ -17,6 +18,7 @@ import { useAppSlice } from '@modules/app';
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#F2F2FF',
   },
   title: {
     fontSize: 24,
@@ -80,6 +82,22 @@ export default function Profile({ navigation }: StackProps) {
   const { removeAllPersistData } = useDataPersist();
   const { dispatch, reset } = useAppSlice();
 
+  const confirmLogout = () => {
+    Alert.alert(
+      'Konfirmasi Logout',
+      'Apakah Anda Yakin Keluar Akun',
+      [
+        {
+          text: 'Batal',
+          onPress: () => console.log('Logout canceled'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: handleLogout },
+      ],
+      { cancelable: false },
+    );
+  };
+
   const handleLogout = async () => {
     try {
       // Hapus data pengguna dari penyimpanan persisten
@@ -88,6 +106,7 @@ export default function Profile({ navigation }: StackProps) {
         console.log('Berhasil menghapus data pengguna.');
         // Reset status login dan hapus data pengguna dari store Redux
         dispatch(reset());
+        Alert.alert('Logout Berhasil', `Berhasil Keluar akun`);
       } else {
         console.error('Gagal megnhapus data pengguna.');
       }
@@ -105,7 +124,7 @@ export default function Profile({ navigation }: StackProps) {
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                navigation.navigate('DetailsStack', { from: 'Profile' });
+                navigation.navigate('LokasiStack', { from: 'Lokasi' });
               }}>
               <Image source={images.berkas} style={styles.menuItemIcon} />
             </TouchableOpacity>
@@ -150,7 +169,7 @@ export default function Profile({ navigation }: StackProps) {
           title="Logout"
           titleStyle={styles.buttonTitle}
           style={styles.button}
-          onPress={handleLogout}
+          onPress={confirmLogout}
         />
       </View>
       <View

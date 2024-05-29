@@ -1,8 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackParamList } from './Stack.typeDefs';
-import { DrawerProps } from '../drawer/Drawer.typeDefs';
-import { StackHeaderLeft, StackHeaderTitle } from './components';
+import { StackHeaderTitle } from './components';
 import { colors } from '@theme';
 
 // views
@@ -10,6 +9,7 @@ import Login from '@views/Login';
 import Home from '@views/Home';
 import Details from '@views/Details';
 import Profile from '@views/Profile';
+import Lokasi from '@views/Lokasi';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -96,6 +96,15 @@ export function ProfileStackNavigator() {
         name="LoginStack"
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Lokasi}
+        name="LokasiStack"
+        options={{
+          title: 'Lokasi',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
         }}
       />
     </Stack.Navigator>

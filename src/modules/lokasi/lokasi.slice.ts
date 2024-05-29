@@ -18,7 +18,7 @@ const slice = createSlice({
   },
 });
 
-export function useAppSlice() {
+export function useLokasiSlice() {
   const dispatch = useDispatch<Dispatch>();
   const state = useSelector(({ lokasi }: State) => lokasi);
   return { dispatch, ...state, ...slice.actions };

@@ -85,7 +85,7 @@ const Login = () => {
           } else {
             console.error('Gagal menyimpan data pengguna.');
           }
-          Alert.alert('Login Successful', `Welcome`);
+          Alert.alert('Login Sukes', `Selamat Datang, ${user.data.nama}`);
         } else {
           dispatch(reset());
           Alert.alert('Login Failed', 'NIK/NIP atau Password Salah');
