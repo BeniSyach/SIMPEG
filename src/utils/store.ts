@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import app from '@modules/app/app.slice';
 import lokasi from '@modules/lokasi/lokasi.slice';
+import identitas from '@modules/Identitas/identitas.slice';
 import config from '@utils/config';
 
 const store = configureStore({
   reducer: {
     app,
     lokasi,
+    identitas,
     // add more store ...
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware(),

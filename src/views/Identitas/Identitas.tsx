@@ -6,9 +6,9 @@ import { colors } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser } from '@modules/app';
 import FormInput from '@components/FormInput';
-import { useLokasiService, useLokasiSlice } from '@modules/lokasi';
 import axios from 'axios';
 import config from '@utils/config';
+import { useIdentitasService, useIdentitasSlice } from '@modules/Identitas';
 
 const styles = StyleSheet.create({
   root: {
@@ -85,15 +85,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Lokasi({ navigation, route }: StackProps) {
+export default function Identitas({ navigation, route }: StackProps) {
   const { getPersistData, setPersistData } = useDataPersist();
-  const { getlokasi } = useLokasiService();
-  const { dispatch, setLokasi } = useLokasiSlice();
-  const [UnitKerja, setUnitKerja] = useState('');
-  const [unitKerjaError, setunitKerjaError] = useState('');
+  const { getIdentitas } = useIdentitasService();
+  const { dispatch, setIdentitas } = useIdentitasSlice();
+  const [Identitas, setInputIdentitas] = useState('');
+  const [IdentitasError, setIdentitasError] = useState('');
   const [isReady, setReady] = useState(false);
-  const [DataLokasi, setDataLokasi] = useState('');
-  const [tokenLokasi, setTokenLokasi] = useState('');
+  const [DataIdentitas, setDataIdentitas] = useState('');
+  const [tokenIdentitas, setTokenIdentitas] = useState('');
   const [loading, setLoading] = useState(false);
 
   const PreloadingLokasi = async () => {
@@ -101,16 +101,16 @@ export default function Lokasi({ navigation, route }: StackProps) {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
       if (token) {
         console.log('User Token found:', token);
-        const lokasi = await getlokasi(token.access_token);
-        console.log('data lokasi', lokasi?.data.unit_kerja);
-        if (lokasi) {
-          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, lokasi);
+        const identitias = await getIdentitas(token.access_token);
+        console.log('data lokasi', identitias?.data.nama);
+        if (identitias) {
+          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, identitias);
           if (SimpanToken) {
-            console.log('data lokasi berhasil disimpan');
-            setDataLokasi(lokasi?.data.unit_kerja);
-            setUnitKerja(lokasi?.data.unit_kerja);
-            setTokenLokasi(lokasi?.access_token);
-            dispatch(setLokasi(lokasi));
+            console.log('data identitias berhasil disimpan');
+            setInputIdentitas(identitias?.data.nama);
+            setDataIdentitas(identitias?.data.nama);
+            setTokenIdentitas(identitias?.access_token);
+            dispatch(setIdentitas(identitias));
           }
         } else {
           Alert.alert('Error Server', `Gagal Mengambil Data`, [
@@ -132,34 +132,34 @@ export default function Lokasi({ navigation, route }: StackProps) {
     PreloadingLokasi();
   }, []);
 
-  const handleUpdateLokasi = async () => {
+  const handleUpdateIdentitas = async () => {
     setLoading(true);
     let valid = true;
-    if (!UnitKerja) {
-      setunitKerjaError('Unit Kerja Tidak Boleh Kosong');
+    if (!Identitas) {
+      setIdentitasError('Nama Identitas Tidak Boleh Kosong');
       valid = false;
     } else {
-      setunitKerjaError('');
+      setIdentitasError('');
     }
     if (valid) {
       try {
-        const UpdateDataLokasi = await axios.post(
-          `${config.API_URL}/api/lokasi/update`,
+        const UpdateDataIdentitas = await axios.post(
+          `${config.API_URL}/api/identitas/update`,
           {
-            unit_kerja: `${UnitKerja}`,
+            nama: `${Identitas}`,
           },
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${tokenLokasi}`,
+              Authorization: `Bearer ${tokenIdentitas}`,
             },
           },
         );
-        const success = UpdateDataLokasi.data;
+        const success = UpdateDataIdentitas.data;
         if (success.status == 'success') {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
           if (SimpanToken) {
-            console.log('data lokasi berhasil disimpan');
+            console.log('data Identitas berhasil disimpan');
             Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
               { text: 'OK', onPress: () => navigation.goBack() },
             ]);
@@ -180,14 +180,14 @@ export default function Lokasi({ navigation, route }: StackProps) {
     <SafeAreaView style={styles.root}>
       <StatusBar barStyle="light-content" />
       <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Edit Lokasi</Text>
+        <Text style={styles.title}>Edit Identitas</Text>
       </View>
       <View style={styles.form}>
         <FormInput
           label="Unit Kerja"
-          defaultValue={DataLokasi}
-          onChangeText={setUnitKerja}
-          error={unitKerjaError}
+          defaultValue={DataIdentitas}
+          onChangeText={setInputIdentitas}
+          error={IdentitasError}
         />
         <View style={styles.buttonContainer}>
           <Button
@@ -196,7 +196,7 @@ export default function Lokasi({ navigation, route }: StackProps) {
             isLoading={loading}
             loaderColor={colors.white}
             title="Edit"
-            onPress={handleUpdateLokasi}
+            onPress={handleUpdateIdentitas}
           />
         </View>
       </View>

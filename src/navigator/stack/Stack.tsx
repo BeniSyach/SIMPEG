@@ -10,6 +10,7 @@ import Home from '@views/Home';
 import Details from '@views/Details';
 import Profile from '@views/Profile';
 import Lokasi from '@views/Lokasi';
+import Identitas from '@views/Identitas';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -101,6 +102,15 @@ export function ProfileStackNavigator() {
       <Stack.Screen
         component={Lokasi}
         name="LokasiStack"
+        options={{
+          title: 'Lokasi',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        component={Identitas}
+        name="IdentitasStack"
         options={{
           title: 'Lokasi',
           headerTitle: () => <StackHeaderTitle />,

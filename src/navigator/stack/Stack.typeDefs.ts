@@ -6,6 +6,7 @@ export type StackParamList = {
   DetailsStack: { from: string };
   ProfileStack: undefined;
   LokasiStack: { from: string };
+  IdentitasStack: { from: string };
   // add more screen props...
 };
 

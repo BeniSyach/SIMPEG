@@ -131,7 +131,11 @@ export default function Profile({ navigation }: StackProps) {
             <Text style={styles.menuItemText}>Lokasi</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('IdentitasStack', { from: 'Identitas' });
+              }}>
               <Image source={images.kinerja} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Identitas</Text>
