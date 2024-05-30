@@ -1,12 +1,12 @@
-import { IUIdentitas } from './identitas.typeDefs';
+import { IUCpns } from './cpns.typeDefs';
 import axios from 'axios';
 import config from '@utils/config';
 
-export function useIdentitasService() {
-  async function getIdentitas(token: string): Promise<IUIdentitas | null> {
+export function useCpnsService() {
+  async function getCpns(token: string): Promise<IUCpns | null> {
     try {
       const response = await axios.post(
-        `${config.API_URL}/api/identitas`,
+        `${config.API_URL}/api/cpns`,
         {},
         {
           headers: {
@@ -23,10 +23,10 @@ export function useIdentitasService() {
 
       return null;
     } catch (error) {
-      console.log('[##] getIdentitas error:', error);
+      console.log('[##] getCpns error:', error);
       return null;
     }
   }
 
-  return { getIdentitas };
+  return { getCpns };
 }

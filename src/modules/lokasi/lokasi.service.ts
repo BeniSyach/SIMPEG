@@ -23,7 +23,7 @@ export function useLokasiService() {
 
       return null;
     } catch (error) {
-      console.error('[##] getlokasi error:', error);
+      console.log('[##] getlokasi error:', error);
       return null;
     }
   }

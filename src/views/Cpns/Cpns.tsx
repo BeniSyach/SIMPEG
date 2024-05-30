@@ -8,7 +8,7 @@ import { IUser } from '@modules/app';
 import FormInput from '@components/FormInput';
 import axios from 'axios';
 import config from '@utils/config';
-import { useIdentitasService, useIdentitasSlice } from '@modules/Identitas';
+import { useCpnsService, useCpnsSlice } from '@modules/CPNS';
 
 const styles = StyleSheet.create({
   root: {
@@ -85,15 +85,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Identitas({ navigation, route }: StackProps) {
+export default function Cpns({ navigation, route }: StackProps) {
   const { getPersistData, setPersistData } = useDataPersist();
-  const { getIdentitas } = useIdentitasService();
-  const { dispatch, setIdentitas } = useIdentitasSlice();
-  const [Identitas, setInputIdentitas] = useState('');
-  const [IdentitasError, setIdentitasError] = useState('');
+  const { getCpns } = useCpnsService();
+  const { dispatch, setCpns } = useCpnsSlice();
+  const [Cpns, setInputCpns] = useState('');
+  const [CpnsError, setCpnsError] = useState('');
   const [isReady, setReady] = useState(false);
-  const [DataIdentitas, setDataIdentitas] = useState('');
-  const [tokenIdentitas, setTokenIdentitas] = useState('');
+  const [DataCpns, setDataCpns] = useState('');
+  const [tokenCpns, setTokenCpns] = useState('');
   const [loading, setLoading] = useState(false);
 
   const PreloadingLokasi = async () => {
@@ -101,16 +101,16 @@ export default function Identitas({ navigation, route }: StackProps) {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
       if (token) {
         console.log('User Token found:', token);
-        const identitias = await getIdentitas(token.access_token);
-        console.log('data lokasi', identitias?.data.nama);
-        if (identitias) {
-          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, identitias);
+        const cpns = await getCpns(token.access_token);
+        console.log('data lokasi', cpns?.data.nomor_sk_cpns);
+        if (cpns) {
+          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, cpns);
           if (SimpanToken) {
-            console.log('data identitias berhasil disimpan');
-            setInputIdentitas(identitias?.data.nama);
-            setDataIdentitas(identitias?.data.nama);
-            setTokenIdentitas(identitias?.access_token);
-            dispatch(setIdentitas(identitias));
+            console.log('data cpns berhasil disimpan');
+            setInputCpns(cpns?.data.nomor_sk_cpns);
+            setDataCpns(cpns?.data.nomor_sk_cpns);
+            setTokenCpns(cpns?.access_token);
+            dispatch(setCpns(cpns));
           }
         } else {
           Alert.alert('Error Server', `Gagal Mengambil Data`, [
@@ -132,34 +132,34 @@ export default function Identitas({ navigation, route }: StackProps) {
     PreloadingLokasi();
   }, []);
 
-  const handleUpdateIdentitas = async () => {
+  const handleUpdateCpns = async () => {
     setLoading(true);
     let valid = true;
-    if (!Identitas) {
-      setIdentitasError('Nama Identitas Tidak Boleh Kosong');
+    if (!Cpns) {
+      setCpnsError('nomor SK CPNS Tidak Boleh Kosong');
       valid = false;
     } else {
-      setIdentitasError('');
+      setCpnsError('');
     }
     if (valid) {
       try {
-        const UpdateDataIdentitas = await axios.post(
-          `${config.API_URL}/api/identitas/update`,
+        const UpdateDataCpns = await axios.post(
+          `${config.API_URL}/api/cpns/update`,
           {
-            nama: `${Identitas}`,
+            nomor_sk_cpns: `${Cpns}`,
           },
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${tokenIdentitas}`,
+              Authorization: `Bearer ${tokenCpns}`,
             },
           },
         );
-        const success = UpdateDataIdentitas.data;
+        const success = UpdateDataCpns.data;
         if (success.status == 'success') {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
           if (SimpanToken) {
-            console.log('data Identitas berhasil disimpan');
+            console.log('data Cpns berhasil disimpan');
             Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
               { text: 'OK', onPress: () => navigation.goBack() },
             ]);
@@ -180,14 +180,14 @@ export default function Identitas({ navigation, route }: StackProps) {
     <SafeAreaView style={styles.root}>
       <StatusBar barStyle="light-content" />
       <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Edit Identitas</Text>
+        <Text style={styles.title}>Edit Cpns</Text>
       </View>
       <View style={styles.form}>
         <FormInput
-          label="Nama Pegawai"
-          defaultValue={DataIdentitas}
-          onChangeText={setInputIdentitas}
-          error={IdentitasError}
+          label="Nomor SK CPNS"
+          defaultValue={DataCpns}
+          onChangeText={setInputCpns}
+          error={CpnsError}
         />
         <View style={styles.buttonContainer}>
           <Button
@@ -196,7 +196,7 @@ export default function Identitas({ navigation, route }: StackProps) {
             isLoading={loading}
             loaderColor={colors.white}
             title="Edit"
-            onPress={handleUpdateIdentitas}
+            onPress={handleUpdateCpns}
           />
         </View>
       </View>
