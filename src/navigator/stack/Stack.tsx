@@ -12,6 +12,7 @@ import Profile from '@views/Profile';
 import Lokasi from '@views/Lokasi';
 import Identitas from '@views/Identitas';
 import Cpns from '@views/Cpns';
+import Pns from '@views/PNS';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -123,6 +124,15 @@ export function ProfileStackNavigator() {
         name="CpnsStack"
         options={{
           title: 'CPNS',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        component={Pns}
+        name="PnsStack"
+        options={{
+          title: 'PNS',
           headerTitle: () => <StackHeaderTitle />,
           headerTitleAlign: 'center',
         }}

@@ -31,8 +31,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   logoButton: {
-    width: 40,
-    height: 40,
+    width: 25,
+    height: 25,
   },
   button: {
     paddingVertical: 8,
@@ -126,7 +126,7 @@ export default function Profile({ navigation }: StackProps) {
               onPress={() => {
                 navigation.navigate('LokasiStack', { from: 'Lokasi' });
               }}>
-              <Image source={images.berkas} style={styles.menuItemIcon} />
+              <Image source={images.lokasi} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Lokasi</Text>
           </View>
@@ -136,7 +136,7 @@ export default function Profile({ navigation }: StackProps) {
               onPress={() => {
                 navigation.navigate('IdentitasStack', { from: 'Identitas' });
               }}>
-              <Image source={images.kinerja} style={styles.menuItemIcon} />
+              <Image source={images.identitas} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Identitas</Text>
           </View>
@@ -146,35 +146,39 @@ export default function Profile({ navigation }: StackProps) {
               onPress={() => {
                 navigation.navigate('CpnsStack', { from: 'CPNS' });
               }}>
-              <Image source={images.absensi} style={styles.menuItemIcon} />
+              <Image source={images.cpns} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>CPNS</Text>
           </View>
         </View>
         <View style={styles.menuItems}>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
-              <Image source={images.berkas} style={styles.menuItemIcon} />
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('PnsStack', { from: 'PNS' });
+              }}>
+              <Image source={images.pns} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>PNS</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
             <TouchableOpacity style={styles.menuItem}>
-              <Image source={images.kinerja} style={styles.menuItemIcon} />
+              <Image source={images.pangkatGaji} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Pangkat Gaji</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
             <TouchableOpacity style={styles.menuItem}>
-              <Image source={images.absensi} style={styles.menuItemIcon} />
+              <Image source={images.user} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>User</Text>
           </View>
         </View>
         <Button
-          image={images.logo_sm}
+          image={images.logout}
           imageStyle={styles.logoButton}
-          title="Logout"
+          title="Keluar"
           titleStyle={styles.buttonTitle}
           style={styles.button}
           onPress={confirmLogout}

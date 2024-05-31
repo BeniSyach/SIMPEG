@@ -8,6 +8,7 @@ export type StackParamList = {
   LokasiStack: { from: string };
   IdentitasStack: { from: string };
   CpnsStack: { from: string };
+  PnsStack: { from: string };
   // add more screen props...
 };
 

@@ -10,6 +10,13 @@ export const images: { [key: string]: ReturnType<typeof require> } = {
   lonceng: require('@assets/images/lonceng.png'),
   profile: require('@assets/images/profile.png'),
   banner: require('@assets/images/banner.png'),
+  logout: require('@assets/images/logout.png'),
+  cpns: require('@assets/images/cpns.png'),
+  user: require('@assets/images/user.png'),
+  pns: require('@assets/images/pns.png'),
+  pangkatGaji: require('@assets/images/pangkat_gaji.png'),
+  identitas: require('@assets/images/identitas.png'),
+  lokasi: require('@assets/images/lokasi.png'),
 };
 
 // preload images
