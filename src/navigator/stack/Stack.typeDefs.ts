@@ -9,6 +9,7 @@ export type StackParamList = {
   IdentitasStack: { from: string };
   CpnsStack: { from: string };
   PnsStack: { from: string };
+  PangkatGajiStack: { from: string };
   // add more screen props...
 };
 

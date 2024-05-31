@@ -4,6 +4,7 @@ import lokasi from '@modules/lokasi/lokasi.slice';
 import identitas from '@modules/Identitas/identitas.slice';
 import cpns from '@modules/CPNS/cpns.slice';
 import pns from '@modules/PNS/pns.slice';
+import PangkatGaji from '@modules/PangkatGaji/PangkatGaji.slice';
 import config from '@utils/config';
 
 const store = configureStore({
@@ -13,6 +14,7 @@ const store = configureStore({
     identitas,
     cpns,
     pns,
+    PangkatGaji,
     // add more store ...
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware(),

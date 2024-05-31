@@ -114,6 +114,7 @@ export default function Profile({ navigation }: StackProps) {
       console.log('Logout error:', error);
     }
   };
+
   return (
     <SafeAreaView style={styles.root}>
       <StatusBar barStyle="light-content" />
@@ -163,7 +164,11 @@ export default function Profile({ navigation }: StackProps) {
             <Text style={styles.menuItemText}>PNS</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('PangkatGajiStack', { from: 'Pangkat Gaji' });
+              }}>
               <Image source={images.pangkatGaji} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Pangkat Gaji</Text>
