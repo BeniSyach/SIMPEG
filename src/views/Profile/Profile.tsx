@@ -174,7 +174,11 @@ export default function Profile({ navigation }: StackProps) {
             <Text style={styles.menuItemText}>Pangkat Gaji</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('UserStack', { from: 'User' });
+              }}>
               <Image source={images.user} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>User</Text>

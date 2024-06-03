@@ -15,6 +15,7 @@ import Cpns from '@views/Cpns';
 import Pns from '@views/PNS';
 import PangkatGaji from '@views/PangkatGaji';
 import Berkas from '@views/Berkas';
+import User from '@views/User';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -154,6 +155,15 @@ export function ProfileStackNavigator() {
         name="PangkatGajiStack"
         options={{
           title: 'Pangkat Gaji',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        component={User}
+        name="UserStack"
+        options={{
+          title: 'User',
           headerTitle: () => <StackHeaderTitle />,
           headerTitleAlign: 'center',
         }}
