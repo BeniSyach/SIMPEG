@@ -9,6 +9,7 @@ import FormInput from '@components/FormInput';
 import { useUserService, useUserSlice } from '@modules/User';
 import axios from 'axios';
 import config from '@utils/config';
+import ImageUpload from '@components/ImageUpload';
 
 const styles = StyleSheet.create({
   root: {
@@ -98,6 +99,7 @@ export default function User({ navigation, route }: StackProps) {
   const [NipUser, setNipUser] = useState(0);
   const [EmailUser, setEmailUser] = useState('');
   const [PhotoUser, setPhotoUser] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [tokenLokasi, setTokenuser] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -140,6 +142,10 @@ export default function User({ navigation, route }: StackProps) {
   useEffect(() => {
     PreloadingLokasi();
   }, []);
+
+  const handleImageSelected = (uri: string) => {
+    setImageUri(uri);
+  };
 
   const handleUpdateLokasi = async () => {
     setLoading(true);
@@ -198,12 +204,7 @@ export default function User({ navigation, route }: StackProps) {
           onChangeText={setnamaUser}
           error={unitKerjaError}
         />
-        <FormInput
-          label="Photo"
-          defaultValue={PhotoUser}
-          onChangeText={setPhotoUser}
-          error={unitKerjaError}
-        />
+        <ImageUpload label="Foto" onImageSelected={handleImageSelected} />
         <View style={styles.buttonContainer}>
           <Button
             style={styles.button}
