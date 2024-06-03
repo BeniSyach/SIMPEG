@@ -69,25 +69,19 @@ const styles = StyleSheet.create({
   },
 });
 
-type AddPangkatGajiProps = {
+type AddBerkasProps = {
   onClose: () => void;
 };
 
-export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
+export function AddBerkas({ onClose }: AddBerkasProps) {
   const [formData, setFormData] = useState({
     id: '',
     nik: 0,
-    ditetapkan: '',
-    nomor_sk: '',
-    tgl_sk: '',
-    tmt_pangkat: '',
-    golongan_ruang: '',
-    masa_kerja_tahun: '',
-    masa_kerja_bulan: '',
-    tmt_gaji_berkala: '',
-    masa_kerja_gaji_tahun: '',
-    masa_kerja_gaji_bulan: '',
-    gaji_pokok: '',
+    jenis_berkas: '',
+    nomor_berkas: '',
+    tgl_mulai: '',
+    tgl_akhir: '',
+    file: '',
   });
 
   const [unitKerjaError, DitetapkanError] = useState('');
@@ -104,69 +98,33 @@ export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
       <Text style={styles.title}>Tambah Data Gaji Pangkat </Text>
       <View style={styles.form}>
         <FormInput
-          label="Ditetapkan"
-          defaultValue={formData.ditetapkan}
-          onChangeText={text => handleInputChange('ditetapkan', text)}
+          label="Jenis Berkas"
+          defaultValue={formData.jenis_berkas}
+          onChangeText={text => handleInputChange('jenis_berkas', text)}
           error={unitKerjaError}
         />
         <FormInput
-          label="Nomor SK"
-          defaultValue={formData.nomor_sk}
-          onChangeText={text => handleInputChange('nomor_sk', text)}
+          label="Nomor Berkas"
+          defaultValue={formData.nomor_berkas}
+          onChangeText={text => handleInputChange('nomor_berkas', text)}
           error={unitKerjaError}
         />
         <FormInput
-          label="Tanggal SK"
-          defaultValue={formData.tgl_sk}
-          onChangeText={text => handleInputChange('tgl_sk', text)}
+          label="Tanggal Mulai"
+          defaultValue={formData.tgl_mulai}
+          onChangeText={text => handleInputChange('tgl_mulai', text)}
           error={unitKerjaError}
         />
         <FormInput
-          label="TMT Pangkat"
-          defaultValue={formData.tmt_pangkat}
-          onChangeText={text => handleInputChange('tmt_pangkat', text)}
+          label="Tanggal Akhir"
+          defaultValue={formData.tgl_akhir}
+          onChangeText={text => handleInputChange('tgl_akhir', text)}
           error={unitKerjaError}
         />
         <FormInput
-          label="Golongan Ruang"
-          defaultValue={formData.golongan_ruang}
-          onChangeText={text => handleInputChange('golongan_ruang', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="Masa Kerja Tahun"
-          defaultValue={formData.masa_kerja_tahun}
-          onChangeText={text => handleInputChange('masa_kerja_tahun', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="Masa Kerja Bulan"
-          defaultValue={formData.masa_kerja_bulan}
-          onChangeText={text => handleInputChange('masa_kerja_bulan', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="TMT Gaji Berkala"
-          defaultValue={formData.tmt_gaji_berkala}
-          onChangeText={text => handleInputChange('tmt_gaji_berkala', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="Masa Kerja Gaji Tahun"
-          defaultValue={formData.masa_kerja_gaji_tahun}
-          onChangeText={text => handleInputChange('masa_kerja_gaji_tahun', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="Masa Kerja Gaji Bulan"
-          defaultValue={formData.masa_kerja_gaji_bulan}
-          onChangeText={text => handleInputChange('masa_kerja_gaji_bulan', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="Gaji Pokok"
-          defaultValue={formData.gaji_pokok}
-          onChangeText={text => handleInputChange('gaji_pokok', text)}
+          label="File"
+          defaultValue={formData.file}
+          onChangeText={text => handleInputChange('file', text)}
           error={unitKerjaError}
         />
         <View style={{ flexDirection: 'row' }}>

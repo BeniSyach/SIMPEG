@@ -5,6 +5,7 @@ import identitas from '@modules/Identitas/identitas.slice';
 import cpns from '@modules/CPNS/cpns.slice';
 import pns from '@modules/PNS/pns.slice';
 import PangkatGaji from '@modules/PangkatGaji/PangkatGaji.slice';
+import berkas from '@modules/Berkas/berkas.slice';
 import config from '@utils/config';
 
 const store = configureStore({
@@ -15,6 +16,7 @@ const store = configureStore({
     cpns,
     pns,
     PangkatGaji,
+    berkas,
     // add more store ...
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware(),

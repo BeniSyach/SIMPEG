@@ -14,6 +14,7 @@ import Identitas from '@views/Identitas';
 import Cpns from '@views/Cpns';
 import Pns from '@views/PNS';
 import PangkatGaji from '@views/PangkatGaji';
+import Berkas from '@views/Berkas';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -51,6 +52,7 @@ export function HomeStackNavigator() {
         // }}
         options={{
           headerShown: false,
+          title: 'Home',
         }}
       />
       <Stack.Screen
@@ -67,6 +69,15 @@ export function HomeStackNavigator() {
         name="LoginStack"
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Berkas}
+        name="BerkasStack"
+        options={{
+          title: 'Berkas',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
         }}
       />
     </Stack.Navigator>

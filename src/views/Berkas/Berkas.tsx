@@ -11,11 +11,11 @@ import {
 import { StackProps } from '@navigator/stack';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import Card from '@components/Card';
-import { usePangkatGajiService, usePangkatGajiSlice } from '@modules/PangkatGaji';
+import { useBerkasService } from '@modules/Berkas';
 import { IUser } from '@modules/app';
 import BottomSheet from '@components/BottomSheet';
-import { AddPangkatGaji } from './Component/AddPangkatGaji';
-import { UpdatePangkatGaji } from './Component/UpdatePangkatGaji';
+import { AddBerkas } from './Component/AddBerkas';
+import { UpdateBerkas } from './Component/UpdateBerkas';
 
 const styles = StyleSheet.create({
   container: {
@@ -30,37 +30,25 @@ const styles = StyleSheet.create({
 type Item = {
   id: string;
   nik: number;
-  ditetapkan: string;
-  nomor_sk: string;
-  tgl_sk: string;
-  tmt_pangkat: string;
-  golongan_ruang: string;
-  masa_kerja_tahun: string;
-  masa_kerja_bulan: string;
-  tmt_gaji_berkala: string;
-  masa_kerja_gaji_tahun: string;
-  masa_kerja_gaji_bulan: string;
-  gaji_pokok: string;
+  jenis_berkas: string;
+  nomor_berkas: string;
+  tgl_mulai: string;
+  tgl_akhir: string;
+  file: string;
 };
 
-export default function PangkatGaji({ navigation, route }: StackProps) {
+export default function Berkas({ navigation, route }: StackProps) {
   const { getPersistData, setPersistData } = useDataPersist();
-  const { getPangkatGaji } = usePangkatGajiService();
+  const { getBerkas } = useBerkasService();
   const [data, setData] = useState<Item[]>([]);
   const [dataUpdate, setDataUpdate] = useState({
     id: '',
     nik: 0,
-    ditetapkan: '',
-    nomor_sk: '',
-    tgl_sk: '',
-    tmt_pangkat: '',
-    golongan_ruang: '',
-    masa_kerja_tahun: '',
-    masa_kerja_bulan: '',
-    tmt_gaji_berkala: '',
-    masa_kerja_gaji_tahun: '',
-    masa_kerja_gaji_bulan: '',
-    gaji_pokok: '',
+    jenis_berkas: '',
+    nomor_berkas: '',
+    tgl_mulai: '',
+    tgl_akhir: '',
+    file: '',
   });
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -82,26 +70,19 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
       if (token) {
         setTokenLama(token.access_token);
         console.log('User Token found:', token);
-        const PangkatGaji = await getPangkatGaji(token.access_token);
-        console.log('data Pangkat Gaji', PangkatGaji?.data[0].nomor_sk);
-        if (PangkatGaji) {
-          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, PangkatGaji);
+        const berkas = await getBerkas(token.access_token);
+        if (berkas) {
+          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, berkas);
           if (SimpanToken) {
             console.log('data Pangkat Gaji berhasil disimpan');
-            const newData = PangkatGaji.data.map((item: any) => ({
+            const newData = berkas.data.map((item: any) => ({
               id: item.id,
               nik: item.nik,
-              ditetapkan: item.ditetapkan,
-              nomor_sk: item.nomor_sk,
-              tgl_sk: item.tgl_sk,
-              tmt_pangkat: item.tmt_pangkat,
-              golongan_ruang: item.golongan_ruang,
-              masa_kerja_tahun: item.masa_kerja_tahun,
-              masa_kerja_bulan: item.masa_kerja_bulan,
-              tmt_gaji_berkala: item.tmt_gaji_berkala,
-              masa_kerja_gaji_tahun: item.masa_kerja_gaji_tahun,
-              masa_kerja_gaji_bulan: item.masa_kerja_gaji_bulan,
-              gaji_pokok: item.gaji_pokok,
+              jenis_berkas: item.jenis_berkas,
+              nomor_berkas: item.nomor_berkas,
+              tgl_mulai: item.tgl_mulai,
+              tgl_akhir: item.tgl_akhir,
+              file: item.file,
             }));
             setData(newData);
           }
@@ -109,17 +90,11 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
           const newData: Item[] = Array.from({ length: 1 }, (_, i) => ({
             id: 'tidak ada',
             nik: 0,
-            ditetapkan: 'tidak ada',
-            nomor_sk: 'tidak ada',
-            tgl_sk: 'tidak ada',
-            tmt_pangkat: 'tidak ada',
-            golongan_ruang: 'tidak ada',
-            masa_kerja_tahun: 'tidak ada',
-            masa_kerja_bulan: 'tidak ada',
-            tmt_gaji_berkala: 'tidak ada',
-            masa_kerja_gaji_tahun: '0',
-            masa_kerja_gaji_bulan: '0',
-            gaji_pokok: '0',
+            jenis_berkas: 'tidak ada',
+            nomor_berkas: 'tidak ada',
+            tgl_mulai: 'tidak ada',
+            tgl_akhir: 'tidak ada',
+            file: 'tidak ada',
           }));
           setData(prevData => [...prevData, ...newData]);
         }
@@ -140,6 +115,8 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
 
   const handleRefresh = () => {
     setRefreshing(true);
+    setOpenAdd(false);
+    setOpenUpdate(false);
     setPage(1);
     // setData([]);
     fetchData();
@@ -190,8 +167,8 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
   const renderItem: ListRenderItem<Item> = ({ item }) => (
     <Card
       id={item.id}
-      title={item.nomor_sk}
-      description={item.golongan_ruang}
+      title={item.jenis_berkas}
+      description={item.nomor_berkas}
       onDelete={handleDeleteItem}
       onEdit={handleEditItem}
     />
@@ -211,10 +188,10 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
         onRefresh={handleRefresh}
       />
       <BottomSheet isOpen={isOpenAdd}>
-        <AddPangkatGaji onClose={() => setOpenAdd(false)} />
+        <AddBerkas onClose={() => setOpenAdd(false)} />
       </BottomSheet>
       <BottomSheet isOpen={isOpenUpdate}>
-        <UpdatePangkatGaji onClose={() => setOpenUpdate(false)} DataPangkatGaji={dataUpdate} />
+        <UpdateBerkas onClose={() => setOpenUpdate(false)} dataBerkas={dataUpdate} />
       </BottomSheet>
     </View>
   );

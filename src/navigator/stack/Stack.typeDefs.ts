@@ -10,6 +10,7 @@ export type StackParamList = {
   CpnsStack: { from: string };
   PnsStack: { from: string };
   PangkatGajiStack: { from: string };
+  BerkasStack: { from: string };
   // add more screen props...
 };
 

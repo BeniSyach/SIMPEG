@@ -210,7 +210,11 @@ export default function Home({ navigation }: StackProps) {
         <Text style={styles.menuTitle}>MENU</Text>
         <View style={styles.menuItems}>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('BerkasStack', { from: 'Berkas' });
+              }}>
               <Image source={images.berkas} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Berkas</Text>
