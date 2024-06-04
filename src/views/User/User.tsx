@@ -91,9 +91,9 @@ export default function User({ navigation, route }: StackProps) {
   const { getUser } = useUserService();
   const { dispatch, setUser } = useUserSlice();
   const [UnitKerja, setUnitKerja] = useState('');
-  const [unitKerjaError, setunitKerjaError] = useState('');
   const [isReady, setReady] = useState(false);
   const [NamaUser, setnamaUser] = useState('');
+  const [NamaUserError, setnamaUserError] = useState('');
   const [IdUser, setidUser] = useState('');
   const [NikUser, setNikUser] = useState(0);
   const [NipUser, setNipUser] = useState(0);
@@ -147,29 +147,34 @@ export default function User({ navigation, route }: StackProps) {
     setImageUri(uri);
   };
 
-  const handleUpdateLokasi = async () => {
+  const handleEditUser = async () => {
     setLoading(true);
     let valid = true;
-    if (!UnitKerja) {
-      setunitKerjaError('Unit Kerja Tidak Boleh Kosong');
+    if (!NamaUser) {
+      setnamaUserError('Nama User Tidak Boleh Kosong');
       valid = false;
     } else {
-      setunitKerjaError('');
+      setnamaUserError('');
     }
     if (valid) {
+      const formData = new FormData();
       try {
-        const UpdateDataLokasi = await axios.post(
-          `${config.API_URL}/api/user/update`,
-          {
-            unit_kerja: `${UnitKerja}`,
+        formData.append('nama', NamaUser);
+
+        if (imageUri) {
+          // Mendapatkan nama file dari URI
+          const fileName = imageUri.split('/').pop() || 'photo.jpg';
+          const response = await fetch(imageUri);
+          const blob = await response.blob();
+          formData.append('photo', blob, fileName);
+        }
+        console.log('data upload', formData);
+        const UpdateDataLokasi = await axios.post(`${config.API_URL}/api/user/update`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${tokenLokasi}`,
           },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${tokenLokasi}`,
-            },
-          },
-        );
+        });
         const success = UpdateDataLokasi.data;
         if (success.status == 'success') {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
@@ -202,7 +207,7 @@ export default function User({ navigation, route }: StackProps) {
           label="Nama"
           defaultValue={NamaUser}
           onChangeText={setnamaUser}
-          error={unitKerjaError}
+          error={NamaUserError}
         />
         <ImageUpload label="Foto" onImageSelected={handleImageSelected} />
         <View style={styles.buttonContainer}>
@@ -212,18 +217,18 @@ export default function User({ navigation, route }: StackProps) {
             isLoading={loading}
             loaderColor={colors.white}
             title="Edit"
-            onPress={handleUpdateLokasi}
+            onPress={handleEditUser}
           />
         </View>
       </View>
       <View
         style={{
-          position: 'absolute', // Mengatur posisi absolut
-          bottom: 0, // Menempatkan teks di bagian bawah layar
+          position: 'absolute',
+          bottom: 0,
           left: 0,
           right: 0,
-          marginBottom: 20, // Jarak dari bawah layar
-          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
+          marginBottom: 20,
+          alignItems: 'center',
         }}>
         <Text
           style={{
