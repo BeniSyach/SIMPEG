@@ -81,6 +81,15 @@ export function HomeStackNavigator() {
           headerTitleAlign: 'center',
         }}
       />
+      <Stack.Screen
+        component={User}
+        name="UserStack"
+        options={{
+          title: 'User',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
+        }}
+      />
     </Stack.Navigator>
   );
 }

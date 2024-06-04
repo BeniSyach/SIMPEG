@@ -91,6 +91,12 @@ export default function Cpns({ navigation, route }: StackProps) {
   const { dispatch, setCpns } = useCpnsSlice();
   const [Cpns, setInputCpns] = useState('');
   const [CpnsError, setCpnsError] = useState('');
+  const [TglSkCpns, setTglSkCpns] = useState('');
+  const [TglSkCpnsError, setTglSkCpnsError] = useState('');
+  const [TmtCpns, setTmtCpns] = useState('');
+  const [TmtCpnsError, setTmtCpnsError] = useState('');
+  const [GolonganRuang, setGolonganRuang] = useState('');
+  const [GolonganRuangError, setGolonganRuangError] = useState('');
   const [isReady, setReady] = useState(false);
   const [DataCpns, setDataCpns] = useState('');
   const [tokenCpns, setTokenCpns] = useState('');
@@ -109,6 +115,9 @@ export default function Cpns({ navigation, route }: StackProps) {
             console.log('data cpns berhasil disimpan');
             setInputCpns(cpns?.data.nomor_sk_cpns);
             setDataCpns(cpns?.data.nomor_sk_cpns);
+            setTglSkCpns(cpns?.data.tgl_sk_cpns);
+            setTmtCpns(cpns?.data.tmt_cpns);
+            setGolonganRuang(cpns?.data.golongan_ruang);
             setTokenCpns(cpns?.access_token);
             dispatch(setCpns(cpns));
           }
@@ -138,6 +147,15 @@ export default function Cpns({ navigation, route }: StackProps) {
     if (!Cpns) {
       setCpnsError('nomor SK CPNS Tidak Boleh Kosong');
       valid = false;
+    } else if (!TglSkCpns) {
+      setTglSkCpnsError('Tanggal SK CPNS Tidak Boleh Kosong');
+      valid = false;
+    } else if (!TmtCpns) {
+      setTmtCpnsError('TMT CPNS Tidak Boleh Kosong');
+      valid = false;
+    } else if (!GolonganRuang) {
+      setGolonganRuang('Golongan Ruang Tidak Boleh Kosong');
+      valid = false;
     } else {
       setCpnsError('');
     }
@@ -147,6 +165,9 @@ export default function Cpns({ navigation, route }: StackProps) {
           `${config.API_URL}/api/cpns/update`,
           {
             nomor_sk_cpns: `${Cpns}`,
+            tgl_sk_cpns: `${TglSkCpns}`,
+            tmt_cpns: `${TmtCpns}`,
+            golongan_ruang: `${GolonganRuang}`,
           },
           {
             headers: {
@@ -188,6 +209,24 @@ export default function Cpns({ navigation, route }: StackProps) {
           defaultValue={DataCpns}
           onChangeText={setInputCpns}
           error={CpnsError}
+        />
+        <FormInput
+          label="Tanggal SK CPNS"
+          defaultValue={TglSkCpns}
+          onChangeText={setTglSkCpns}
+          error={TglSkCpnsError}
+        />
+        <FormInput
+          label="TMT CPNS"
+          defaultValue={TmtCpns}
+          onChangeText={setTmtCpns}
+          error={TmtCpnsError}
+        />
+        <FormInput
+          label="Golongan Ruang"
+          defaultValue={GolonganRuang}
+          onChangeText={setGolonganRuang}
+          error={GolonganRuangError}
         />
         <View style={styles.buttonContainer}>
           <Button

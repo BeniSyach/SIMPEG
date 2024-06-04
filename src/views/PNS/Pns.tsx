@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, Alert } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView,
+  Alert,
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
+  ScrollView,
+} from 'react-native';
 import Button from '@components/Button';
 import { StackProps } from '@navigator/stack';
 import { colors } from '@theme';
@@ -91,6 +101,16 @@ export default function Pns({ navigation, route }: StackProps) {
   const { dispatch, setPns } = usePnsSlice();
   const [Pns, setInputPns] = useState('');
   const [PnsError, setPnsError] = useState('');
+  const [TglSkPns, setTglSkPns] = useState('');
+  const [TglSkPnsError, setTglSkPnsError] = useState('');
+  const [TmtPns, setTmtPns] = useState('');
+  const [TmtPnsError, setTmtPnsError] = useState('');
+  const [GolonganRuang, setGolonganRuang] = useState('');
+  const [GolonganRuangError, setGolonganRuangError] = useState('');
+  const [Sumpah, setSumpah] = useState('');
+  const [SumpahError, setSumpahError] = useState('');
+  const [TahunSumpah, setTahunSumpah] = useState(0);
+  const [TahunSumpahError, setTahunSumpahError] = useState('');
   const [isReady, setReady] = useState(false);
   const [DataPns, setDataPns] = useState('');
   const [tokenPns, setTokenPns] = useState('');
@@ -109,6 +129,11 @@ export default function Pns({ navigation, route }: StackProps) {
             console.log('data pns berhasil disimpan');
             setInputPns(pns?.data.nomor_sk_pns);
             setDataPns(pns?.data.nomor_sk_pns);
+            setTglSkPns(pns?.data.tgl_sk_pns);
+            setTmtPns(pns?.data.tmt_pns);
+            setGolonganRuang(pns?.data.golongan_ruang);
+            setSumpah(pns?.data.sumpah);
+            setTahunSumpah(pns?.data.tahun_sumpah);
             setTokenPns(pns?.access_token);
             dispatch(setPns(pns));
           }
@@ -138,6 +163,21 @@ export default function Pns({ navigation, route }: StackProps) {
     if (!Pns) {
       setPnsError('nomor SK PNS Tidak Boleh Kosong');
       valid = false;
+    } else if (!TglSkPns) {
+      setTglSkPnsError('Tanggal SK PNS Tidak Boleh Kosong');
+      valid = false;
+    } else if (!TmtPns) {
+      setTmtPnsError('TMT PNS Tidak Boleh Kosong');
+      valid = false;
+    } else if (!GolonganRuang) {
+      setGolonganRuangError('Golongan Ruang Tidak Boleh Kosong');
+      valid = false;
+    } else if (!Sumpah) {
+      setSumpahError('Sumpah Tidak Boleh Kosong');
+      valid = false;
+    } else if (TahunSumpah < 1000) {
+      setTahunSumpahError('Tahun Sumpah Tidak Boleh Kosong');
+      valid = false;
     } else {
       setPnsError('');
     }
@@ -147,6 +187,11 @@ export default function Pns({ navigation, route }: StackProps) {
           `${config.API_URL}/api/cpns/update`,
           {
             nomor_sk_pns: `${Pns}`,
+            tgl_sk_pns: `${TglSkPns}`,
+            tmt_pns: `${TmtPns}`,
+            golongan_ruang: `${GolonganRuang}`,
+            sumpah: `${Sumpah}`,
+            tahun_sumpah: `${TahunSumpah}`,
           },
           {
             headers: {
@@ -173,50 +218,93 @@ export default function Pns({ navigation, route }: StackProps) {
     setLoading(false);
   };
 
+  const handleChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+    const text = e.nativeEvent.text;
+    const numericValue = parseFloat(text);
+    if (!isNaN(numericValue)) {
+      setTahunSumpah(numericValue);
+    } else {
+      setTahunSumpah(0); // or handle the invalid input case as needed
+    }
+  };
+
   if (!isReady) {
     return null; // or a loading indicator
   }
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" />
-      <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Edit Cpns</Text>
-      </View>
-      <View style={styles.form}>
-        <FormInput
-          label="Nomor SK PNS"
-          defaultValue={DataPns}
-          onChangeText={setInputPns}
-          error={PnsError}
-        />
-        <View style={styles.buttonContainer}>
-          <Button
-            style={styles.button}
-            titleStyle={styles.buttonTitle}
-            isLoading={loading}
-            loaderColor={colors.white}
-            title="Edit"
-            onPress={handleUpdateCpns}
-          />
+      <ScrollView>
+        <StatusBar barStyle="light-content" />
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <Text style={styles.title}>Edit Cpns</Text>
         </View>
-      </View>
-      <View
-        style={{
-          position: 'absolute', // Mengatur posisi absolut
-          bottom: 0, // Menempatkan teks di bagian bawah layar
-          left: 0,
-          right: 0,
-          marginBottom: 20, // Jarak dari bawah layar
-          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
-        }}>
-        <Text
+        <View style={styles.form}>
+          <FormInput
+            label="Nomor SK PNS"
+            defaultValue={DataPns}
+            onChangeText={setInputPns}
+            error={PnsError}
+          />
+          <FormInput
+            label="Tanggal SK PNS"
+            defaultValue={TglSkPns}
+            onChangeText={setTglSkPns}
+            error={TglSkPnsError}
+          />
+          <FormInput
+            label="TMT PNS"
+            defaultValue={TmtPns}
+            onChangeText={setTmtPns}
+            error={TmtPnsError}
+          />
+          <FormInput
+            label="Golongan Ruang"
+            defaultValue={GolonganRuang}
+            onChangeText={setGolonganRuang}
+            error={GolonganRuangError}
+          />
+          <FormInput
+            label="Sumpah"
+            defaultValue={Sumpah}
+            onChangeText={setSumpah}
+            error={SumpahError}
+          />
+          <FormInput
+            label="Tahun Sumpah"
+            keyboardType="numeric"
+            defaultValue={TahunSumpah.toString()}
+            onChange={handleChange}
+            error={TahunSumpahError}
+          />
+          <View style={styles.buttonContainer}>
+            <Button
+              style={styles.button}
+              titleStyle={styles.buttonTitle}
+              isLoading={loading}
+              loaderColor={colors.white}
+              title="Edit"
+              onPress={handleUpdateCpns}
+            />
+          </View>
+        </View>
+        <View
           style={{
-            fontSize: 12,
-            color: '#000000',
+            position: 'absolute', // Mengatur posisi absolut
+            bottom: 0, // Menempatkan teks di bagian bawah layar
+            left: 0,
+            right: 0,
+            marginBottom: 20, // Jarak dari bawah layar
+            alignItems: 'center', // Menempatkan teks di tengah secara horizontal
           }}>
-          © IT RSUD HAT
-        </Text>
-      </View>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#000000',
+            }}>
+            © IT RSUD HAT
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, Alert } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, Alert, ScrollView } from 'react-native';
 import Button from '@components/Button';
 import { StackProps } from '@navigator/stack';
 import { colors } from '@theme';
@@ -91,6 +91,24 @@ export default function Identitas({ navigation, route }: StackProps) {
   const { dispatch, setIdentitas } = useIdentitasSlice();
   const [Identitas, setInputIdentitas] = useState('');
   const [IdentitasError, setIdentitasError] = useState('');
+  const [GelarDepan, setGelarDepan] = useState('');
+  const [GelarDepanError, setGelarDepanError] = useState('');
+  const [GelarBelakang, setGelarBelakang] = useState('');
+  const [GelarBelakangError, setGelarBelakangError] = useState('');
+  const [TempatLahir, setTempatLahir] = useState('');
+  const [TempatLahirError, setTempatLahirError] = useState('');
+  const [TanggalLahir, setTanggalLahir] = useState('');
+  const [TanggalLahirError, setTanggalLahirError] = useState('');
+  const [JenisKelamin, setJenisKelamin] = useState('');
+  const [JenisKelaminError, setJenisKelaminError] = useState('');
+  const [Agama, setAgama] = useState('');
+  const [AgamaError, setAgamaError] = useState('');
+  const [StatusPegawai, setStatusPegawai] = useState('');
+  const [StatusPegawaiError, setStatusPegawaiError] = useState('');
+  const [StatusKawin, setStatusKawin] = useState('');
+  const [StatusKawinError, setStatusKawinError] = useState('');
+  const [KedudukanPegawai, setKedudukanPegawai] = useState('');
+  const [KedudukanPegawaiError, setKedudukanPegawaiError] = useState('');
   const [isReady, setReady] = useState(false);
   const [DataIdentitas, setDataIdentitas] = useState('');
   const [tokenIdentitas, setTokenIdentitas] = useState('');
@@ -109,6 +127,15 @@ export default function Identitas({ navigation, route }: StackProps) {
             console.log('data identitias berhasil disimpan');
             setInputIdentitas(identitias?.data.nama);
             setDataIdentitas(identitias?.data.nama);
+            setGelarDepan(identitias?.data.gelar_depan);
+            setGelarBelakang(identitias?.data.gelar_belakang);
+            setTempatLahir(identitias?.data.tempat_lahir);
+            setTanggalLahir(identitias?.data.tanggal_lahir);
+            setJenisKelamin(identitias?.data.jenis_kelamin);
+            setAgama(identitias?.data.agama);
+            setStatusPegawai(identitias?.data.status_pegawai);
+            setStatusKawin(identitias?.data.status_kawin);
+            setKedudukanPegawai(identitias?.data.kedudukan_pegawai);
             setTokenIdentitas(identitias?.access_token);
             dispatch(setIdentitas(identitias));
           }
@@ -138,6 +165,33 @@ export default function Identitas({ navigation, route }: StackProps) {
     if (!Identitas) {
       setIdentitasError('Nama Identitas Tidak Boleh Kosong');
       valid = false;
+    } else if (!GelarDepan) {
+      setGelarDepanError('Gelar Depan Tidak Boleh Kosong');
+      valid = false;
+    } else if (!GelarBelakang) {
+      setGelarBelakangError('Gelar Belakang Tidak Boleh Kosong');
+      valid = false;
+    } else if (!TempatLahir) {
+      setTempatLahirError('Tempat Lahir Tidak Boleh Kosong');
+      valid = false;
+    } else if (!TanggalLahir) {
+      setTanggalLahirError('Tanggal Lahir Tidak Boleh Kosong');
+      valid = false;
+    } else if (!JenisKelamin) {
+      setJenisKelaminError('Jenis Kelamin Tidak Boleh Kosong');
+      valid = false;
+    } else if (!Agama) {
+      setAgamaError('Agama Tidak Boleh Kosong');
+      valid = false;
+    } else if (!StatusPegawai) {
+      setStatusPegawaiError('Status Pegawai Tidak Boleh Kosong');
+      valid = false;
+    } else if (!StatusKawin) {
+      setStatusKawinError('Status Kawin Tidak Boleh Kosong');
+      valid = false;
+    } else if (!KedudukanPegawai) {
+      setKedudukanPegawai('Kedudukan Pegawai Tidak Boleh Kosong');
+      valid = false;
     } else {
       setIdentitasError('');
     }
@@ -147,6 +201,15 @@ export default function Identitas({ navigation, route }: StackProps) {
           `${config.API_URL}/api/identitas/update`,
           {
             nama: `${Identitas}`,
+            gelar_depan: `${GelarDepan}`,
+            gelar_belakang: `${GelarBelakang}`,
+            tempat_lahir: `${TempatLahir}`,
+            tanggal_lahir: `${TanggalLahir}`,
+            jenis_kelamin: `${JenisKelamin}`,
+            agama: `${Agama}`,
+            status_pegawai: `${StatusPegawai}`,
+            status_kawin: `${StatusKawin}`,
+            kedudukan_pegawai: `${KedudukanPegawai}`,
           },
           {
             headers: {
@@ -178,45 +241,101 @@ export default function Identitas({ navigation, route }: StackProps) {
   }
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" />
-      <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Edit Identitas</Text>
-      </View>
-      <View style={styles.form}>
-        <FormInput
-          label="Nama Pegawai"
-          defaultValue={DataIdentitas}
-          onChangeText={setInputIdentitas}
-          error={IdentitasError}
-        />
-        <View style={styles.buttonContainer}>
-          <Button
-            style={styles.button}
-            titleStyle={styles.buttonTitle}
-            isLoading={loading}
-            loaderColor={colors.white}
-            title="Edit"
-            onPress={handleUpdateIdentitas}
-          />
+      <ScrollView>
+        <StatusBar barStyle="light-content" />
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <Text style={styles.title}>Edit Identitas</Text>
         </View>
-      </View>
-      <View
-        style={{
-          position: 'absolute', // Mengatur posisi absolut
-          bottom: 0, // Menempatkan teks di bagian bawah layar
-          left: 0,
-          right: 0,
-          marginBottom: 20, // Jarak dari bawah layar
-          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
-        }}>
-        <Text
+        <View style={styles.form}>
+          <FormInput
+            label="Nama Pegawai"
+            defaultValue={DataIdentitas}
+            onChangeText={setInputIdentitas}
+            error={IdentitasError}
+          />
+          <FormInput
+            label="Gelar Depan"
+            defaultValue={GelarDepan}
+            onChangeText={setGelarDepan}
+            error={GelarDepanError}
+          />
+          <FormInput
+            label="Gelar Belakang"
+            defaultValue={GelarBelakang}
+            onChangeText={setGelarBelakang}
+            error={GelarBelakangError}
+          />
+          <FormInput
+            label="Tempat Lahir"
+            defaultValue={TempatLahir}
+            onChangeText={setTempatLahir}
+            error={TempatLahirError}
+          />
+          <FormInput
+            label="Tanggal Lahir"
+            defaultValue={TanggalLahir}
+            onChangeText={setTanggalLahir}
+            error={TanggalLahirError}
+          />
+          <FormInput
+            label="Jenis Kelamin"
+            defaultValue={JenisKelamin}
+            onChangeText={setJenisKelamin}
+            error={JenisKelaminError}
+          />
+          <FormInput
+            label="Agama"
+            defaultValue={Agama}
+            onChangeText={setAgama}
+            error={AgamaError}
+          />
+          <FormInput
+            label="Status Pegawai"
+            defaultValue={StatusPegawai}
+            onChangeText={setStatusPegawai}
+            error={StatusPegawaiError}
+          />
+          <FormInput
+            label="Status Kawin"
+            defaultValue={StatusKawin}
+            onChangeText={setStatusKawin}
+            error={StatusKawinError}
+          />
+          <FormInput
+            label="Kedudukan Pegawai"
+            defaultValue={KedudukanPegawai}
+            onChangeText={setKedudukanPegawai}
+            error={KedudukanPegawaiError}
+          />
+          <View style={styles.buttonContainer}>
+            <Button
+              style={styles.button}
+              titleStyle={styles.buttonTitle}
+              isLoading={loading}
+              loaderColor={colors.white}
+              title="Edit"
+              onPress={handleUpdateIdentitas}
+            />
+          </View>
+        </View>
+        <View
           style={{
-            fontSize: 12,
-            color: '#000000',
+            position: 'absolute', // Mengatur posisi absolut
+            bottom: 0, // Menempatkan teks di bagian bawah layar
+            left: 0,
+            right: 0,
+            marginBottom: 20, // Jarak dari bawah layar
+            alignItems: 'center', // Menempatkan teks di tengah secara horizontal
           }}>
-          © IT RSUD HAT
-        </Text>
-      </View>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#000000',
+            }}>
+            © IT RSUD HAT
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

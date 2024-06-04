@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, Alert } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, Alert, ScrollView } from 'react-native';
 import Button from '@components/Button';
 import { StackProps } from '@navigator/stack';
 import { colors } from '@theme';
@@ -91,6 +91,21 @@ export default function Lokasi({ navigation, route }: StackProps) {
   const { dispatch, setLokasi } = useLokasiSlice();
   const [UnitKerja, setUnitKerja] = useState('');
   const [unitKerjaError, setunitKerjaError] = useState('');
+  const [SubUnitKerja, setSubUnitKerja] = useState('');
+  const [SubUnitKerjaError, setSubUnitKerjaError] = useState('');
+  const [JenisJabatan, setJenisJabatan] = useState('');
+  const [JenisJabatanError, setJenisJabatanError] = useState('');
+  const [jabatan, setJabatan] = useState('');
+  const [JabatanError, setJabatanError] = useState('');
+  const [KdUnitKerja, setKdUnitKerja] = useState('');
+  const [KdUnitKerjaError, setKdUnitKerjaError] = useState('');
+  const [KdSubUnitKerja, setKdSubUnitKerja] = useState('');
+  const [KdSubUnitKerjaError, setKdSubUnitKerjaError] = useState('');
+  const [KdJenisJabatan, setKdJenisJabatan] = useState('');
+  const [KdJenisJabatanError, setKdJenisJabatanError] = useState('');
+  const [KdJabatan, setKdJabatan] = useState('');
+  const [KdJabatanError, setKdJabatanError] = useState('');
+
   const [isReady, setReady] = useState(false);
   const [DataLokasi, setDataLokasi] = useState('');
   const [tokenLokasi, setTokenLokasi] = useState('');
@@ -109,6 +124,13 @@ export default function Lokasi({ navigation, route }: StackProps) {
             console.log('data lokasi berhasil disimpan');
             setDataLokasi(lokasi?.data.unit_kerja);
             setUnitKerja(lokasi?.data.unit_kerja);
+            setSubUnitKerja(lokasi?.data.sub_unit_kerja);
+            setJenisJabatan(lokasi?.data.jenis_jabatan);
+            setJabatan(lokasi?.data.jabatan);
+            setKdUnitKerja(lokasi?.data.kd_unit_kerja);
+            setKdSubUnitKerja(lokasi?.data.kd_sub_unit_kerja);
+            setKdJenisJabatan(lokasi?.data.kd_jenis_jabatan);
+            setKdJabatan(lokasi?.data.kd_jabatan);
             setTokenLokasi(lokasi?.access_token);
             dispatch(setLokasi(lokasi));
           }
@@ -138,6 +160,27 @@ export default function Lokasi({ navigation, route }: StackProps) {
     if (!UnitKerja) {
       setunitKerjaError('Unit Kerja Tidak Boleh Kosong');
       valid = false;
+    } else if (!SubUnitKerja) {
+      setSubUnitKerjaError('Sub Unit Kerja Tidak Boleh Kosong');
+      valid = false;
+    } else if (!JenisJabatan) {
+      setJenisJabatanError('Jenis Jabatan Tidak Boleh Kosong');
+      valid = false;
+    } else if (!jabatan) {
+      setJabatanError('Jabatan Tidak Boleh Kosong');
+      valid = false;
+    } else if (!KdUnitKerja) {
+      setKdUnitKerjaError('Kode Unit Kerja Tidak Boleh Kosong');
+      valid = false;
+    } else if (!KdSubUnitKerja) {
+      setKdSubUnitKerjaError('Kode Sub Unit Kerja Tidak Boleh Kosong');
+      valid = false;
+    } else if (!KdJenisJabatan) {
+      setKdJenisJabatanError('Kode Jenis Jabatan Tidak Boleh Kosong');
+      valid = false;
+    } else if (!KdJabatan) {
+      setKdJabatanError('Kode Jabatan Tidak Boleh Kosong');
+      valid = false;
     } else {
       setunitKerjaError('');
     }
@@ -147,6 +190,13 @@ export default function Lokasi({ navigation, route }: StackProps) {
           `${config.API_URL}/api/lokasi/update`,
           {
             unit_kerja: `${UnitKerja}`,
+            sub_unit_kerja: `${SubUnitKerja}`,
+            jenis_jabatan: `${JenisJabatan}`,
+            jabatan: `${jabatan}`,
+            kd_unit_kerja: `${KdUnitKerja}`,
+            kd_sub_unit_kerja: `${KdSubUnitKerja}`,
+            kd_jenis_jabatan: `${KdJenisJabatan}`,
+            kd_jabatan: `${KdJabatan}`,
           },
           {
             headers: {
@@ -178,45 +228,89 @@ export default function Lokasi({ navigation, route }: StackProps) {
   }
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" />
-      <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Edit Lokasi</Text>
-      </View>
-      <View style={styles.form}>
-        <FormInput
-          label="Unit Kerja"
-          defaultValue={DataLokasi}
-          onChangeText={setUnitKerja}
-          error={unitKerjaError}
-        />
-        <View style={styles.buttonContainer}>
-          <Button
-            style={styles.button}
-            titleStyle={styles.buttonTitle}
-            isLoading={loading}
-            loaderColor={colors.white}
-            title="Edit"
-            onPress={handleUpdateLokasi}
-          />
+      <ScrollView>
+        <StatusBar barStyle="light-content" />
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <Text style={styles.title}>Edit Lokasi</Text>
         </View>
-      </View>
-      <View
-        style={{
-          position: 'absolute', // Mengatur posisi absolut
-          bottom: 0, // Menempatkan teks di bagian bawah layar
-          left: 0,
-          right: 0,
-          marginBottom: 20, // Jarak dari bawah layar
-          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
-        }}>
-        <Text
+        <View style={styles.form}>
+          <FormInput
+            label="Unit Kerja"
+            defaultValue={DataLokasi}
+            onChangeText={setUnitKerja}
+            error={unitKerjaError}
+          />
+          <FormInput
+            label="Sub Unit Kerja"
+            defaultValue={SubUnitKerja}
+            onChangeText={setSubUnitKerja}
+            error={SubUnitKerjaError}
+          />
+          <FormInput
+            label="Jenis Jabatan"
+            defaultValue={JenisJabatan}
+            onChangeText={setJenisJabatan}
+            error={JenisJabatanError}
+          />
+          <FormInput
+            label="Jabatan"
+            defaultValue={jabatan}
+            onChangeText={setJabatan}
+            error={JabatanError}
+          />
+          <FormInput
+            label="Kode Unit Kerja"
+            defaultValue={KdUnitKerja}
+            onChangeText={setKdUnitKerja}
+            error={KdUnitKerjaError}
+          />
+          <FormInput
+            label="Kode Sub Unit Kerja"
+            defaultValue={KdSubUnitKerja}
+            onChangeText={setKdUnitKerja}
+            error={KdSubUnitKerjaError}
+          />
+          <FormInput
+            label="Kode Jenis Jabatan"
+            defaultValue={KdJenisJabatan}
+            onChangeText={setKdJenisJabatan}
+            error={KdJenisJabatanError}
+          />
+          <FormInput
+            label="Kode Jabatan"
+            defaultValue={KdJabatan}
+            onChangeText={setKdJabatan}
+            error={KdJabatanError}
+          />
+          <View style={styles.buttonContainer}>
+            <Button
+              style={styles.button}
+              titleStyle={styles.buttonTitle}
+              isLoading={loading}
+              loaderColor={colors.white}
+              title="Edit"
+              onPress={handleUpdateLokasi}
+            />
+          </View>
+        </View>
+        <View
           style={{
-            fontSize: 12,
-            color: '#000000',
+            position: 'absolute', // Mengatur posisi absolut
+            bottom: 0, // Menempatkan teks di bagian bawah layar
+            left: 0,
+            right: 0,
+            marginBottom: 20, // Jarak dari bawah layar
+            alignItems: 'center', // Menempatkan teks di tengah secara horizontal
           }}>
-          © IT RSUD HAT
-        </Text>
-      </View>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#000000',
+            }}>
+            © IT RSUD HAT
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

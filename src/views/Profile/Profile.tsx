@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
   logoButton: {
     width: 25,
     height: 25,
+    marginRight: 8,
   },
   button: {
     paddingVertical: 8,

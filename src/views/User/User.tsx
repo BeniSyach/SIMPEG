@@ -159,7 +159,7 @@ export default function User({ navigation, route }: StackProps) {
     if (valid) {
       try {
         const UpdateDataLokasi = await axios.post(
-          `${config.API_URL}/api/user/update/${IdUser}`,
+          `${config.API_URL}/api/user/update`,
           {
             unit_kerja: `${UnitKerja}`,
           },

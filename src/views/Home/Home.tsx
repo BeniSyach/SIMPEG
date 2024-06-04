@@ -190,15 +190,26 @@ export default function Home({ navigation }: StackProps) {
       </View>
       <View style={styles.welcome}>
         <View style={styles.foto_profile}>
-          <Image source={images.profile} style={styles.profile} />
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('UserStack', { from: 'User' });
+            }}>
+            <Image source={images.profile} style={styles.profile} />
+          </TouchableOpacity>
         </View>
         <View style={{ marginHorizontal: 5 }}>
           <Text style={styles.welcomeText}>Halo, Selamat Datang</Text>
           <Text style={styles.userName}>{user?.data.nama}</Text>
           <Text style={styles.userPosition}>{user?.data.nik}</Text>
         </View>
+
         <View style={{ flexDirection: 'row-reverse' }}>
-          <Image source={images.lonceng} style={styles.logo_lonceng} />
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('UserStack', { from: 'User' });
+            }}>
+            <Image source={images.lonceng} style={styles.logo_lonceng} />
+          </TouchableOpacity>
         </View>
       </View>
       <View style={styles.banner}>
