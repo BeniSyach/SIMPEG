@@ -12,6 +12,7 @@ export type StackParamList = {
   PangkatGajiStack: { from: string };
   BerkasStack: { from: string };
   UserStack: { from: string };
+  AbsensiStack: { from: string };
   // add more screen props...
 };
 

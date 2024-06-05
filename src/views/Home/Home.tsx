@@ -237,7 +237,11 @@ export default function Home({ navigation }: StackProps) {
             <Text style={styles.menuItemText}>E-Kinerja</Text>
           </View>
           <View style={{ alignItems: 'center', marginHorizontal: 10 }}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigation.navigate('AbsensiStack', { from: 'Absensi' });
+              }}>
               <Image source={images.absensi} style={styles.menuItemIcon} />
             </TouchableOpacity>
             <Text style={styles.menuItemText}>Absensi</Text>

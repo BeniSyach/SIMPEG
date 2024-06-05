@@ -16,6 +16,7 @@ import Pns from '@views/PNS';
 import PangkatGaji from '@views/PangkatGaji';
 import Berkas from '@views/Berkas';
 import User from '@views/User';
+import Absensi from '@views/Absensi';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -86,6 +87,15 @@ export function HomeStackNavigator() {
         name="UserStack"
         options={{
           title: 'User',
+          headerTitle: () => <StackHeaderTitle />,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        component={Absensi}
+        name="AbsensiStack"
+        options={{
+          title: 'Absensi',
           headerTitle: () => <StackHeaderTitle />,
           headerTitleAlign: 'center',
         }}

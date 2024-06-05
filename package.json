@@ -50,7 +50,8 @@
     "react-native-web": "~0.19.11",
     "react-redux": "^9.1.2",
     "redux-logger": "^3.0.6",
-    "expo-image-picker": "~15.0.5"
+    "expo-image-picker": "~15.0.5",
+    "@react-native-picker/picker": "2.7.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
