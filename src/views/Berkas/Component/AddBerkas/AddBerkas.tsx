@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import GradientButton from '@components/GradientButton';
 import { colors, fonts } from '@theme';
 import { windowWidth } from '@utils/deviceInfo';
 import FormInput from '@components/FormInput';
+import DatePicker from '@components/DatePicker';
+import DocumentPickerComponent from '@components/DokumentPicker/DokumenPicker';
 
 const styles = StyleSheet.create({
   root: {
@@ -14,8 +16,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.openSan.bold,
     color: colors.black,
-    marginTop: 16,
-    marginBottom: 32,
+    marginVertical: 5,
     width: '100%',
     textAlign: 'center',
   },
@@ -67,6 +68,25 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  selectedDateText: {
+    marginBottom: 5,
+    fontSize: 14,
+  },
+  selectedDocumentText: {
+    marginTop: 20,
+    fontSize: 16,
+  },
+  customDocumentPickerStyle: {
+    marginTop: 20,
+    borderColor: 'green',
+  },
+  customTextStyle: {
+    color: 'blue',
+    fontSize: 18,
+  },
+  customErrorTextStyle: {
+    color: 'orange',
+  },
 });
 
 type AddBerkasProps = {
@@ -84,6 +104,47 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
     file: '',
   });
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
+  const [error, setError] = useState<string>('');
+
+  const handleDateStartChange = (date: Date) => {
+    setSelectedDate(date);
+    setError(''); // Clear error when a date is selected
+  };
+
+  const handleDateEndChange = (date: Date) => {
+    setSelectedEndDate(date);
+    setError(''); // Clear error when a date is selected
+  };
+
+  const handleSubmit = () => {
+    let valid = true;
+    if (!selectedDate) {
+      setError('Tanggal harus diisi');
+      valid = false;
+    } else if (!selectedEndDate) {
+      setError('Tanggal harus diisi');
+      valid = false;
+    } else if (!selectedDocument) {
+      setError('Dokumen harus diisi');
+      valid = false;
+    } else {
+      // Lakukan sesuatu dengan tanggal yang dipilih
+      console.log('Tanggal yang dipilih:', selectedDate);
+      console.log('Dokumen yang dipilih:', selectedDocument);
+      Alert.alert('Dokumen Terpilih', `Nama Dokumen: ${selectedDocument.name}`);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const [unitKerjaError, DitetapkanError] = useState('');
 
   const handleInputChange = (name: string, value: string) => {
@@ -91,6 +152,11 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleDocumentPicked = (document: any) => {
+    setSelectedDocument(document);
+    setError(''); // Clear error when a document is selected
   };
 
   return (
@@ -103,30 +169,32 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
           onChangeText={text => handleInputChange('jenis_berkas', text)}
           error={unitKerjaError}
         />
+
         <FormInput
           label="Nomor Berkas"
           defaultValue={formData.nomor_berkas}
           onChangeText={text => handleInputChange('nomor_berkas', text)}
           error={unitKerjaError}
         />
-        <FormInput
-          label="Tanggal Mulai"
-          defaultValue={formData.tgl_mulai}
-          onChangeText={text => handleInputChange('tgl_mulai', text)}
-          error={unitKerjaError}
+
+        <Text style={styles.selectedDateText}>Tanggal Mulai : </Text>
+        <DatePicker onDateChange={handleDateStartChange} error={error} />
+
+        <Text style={[styles.selectedDateText, { marginVertical: 15 }]}>Tanggal Akhir : </Text>
+        <DatePicker onDateChange={handleDateEndChange} error={error} />
+
+        <DocumentPickerComponent
+          onDocumentPicked={handleDocumentPicked}
+          error={error}
+          style={styles.customDocumentPickerStyle}
+          textStyle={styles.customTextStyle}
+          errorTextStyle={styles.customErrorTextStyle}
         />
-        <FormInput
-          label="Tanggal Akhir"
-          defaultValue={formData.tgl_akhir}
-          onChangeText={text => handleInputChange('tgl_akhir', text)}
-          error={unitKerjaError}
-        />
-        <FormInput
-          label="File"
-          defaultValue={formData.file}
-          onChangeText={text => handleInputChange('file', text)}
-          error={unitKerjaError}
-        />
+        {selectedDocument && (
+          <Text style={styles.selectedDocumentText}>
+            Selected Document: {selectedDocument.name}
+          </Text>
+        )}
         <View style={{ flexDirection: 'row' }}>
           <GradientButton
             title="OK"
