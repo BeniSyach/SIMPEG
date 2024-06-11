@@ -162,11 +162,14 @@ export default function User({ navigation, route }: StackProps) {
         formData.append('nama', NamaUser);
 
         if (imageUri) {
+          console.log('data foto', imageUri);
           // Mendapatkan nama file dari URI
           const fileName = imageUri.split('/').pop() || 'photo.jpg';
-          const response = await fetch(imageUri);
-          const blob = await response.blob();
-          formData.append('photo', blob, fileName);
+          // const response = await fetch(imageUri);
+          // const blob = await response.blob();
+          // console.log('data photo 1', blob);
+          // formData.append('photo', blob, fileName);
+          formData.append('photo', { uri: imageUri, name: fileName, type: 'image/jpeg' } as any);
         }
         console.log('data upload', formData);
         const UpdateDataLokasi = await axios.post(`${config.API_URL}/api/user/update`, formData, {

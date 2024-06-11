@@ -12,6 +12,8 @@ import { StackProps } from '@navigator/stack';
 import { images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser, useAppSlice } from '@modules/app';
+import axios from 'axios';
+import config from '@utils/config';
 
 const styles = StyleSheet.create({
   container: {
@@ -45,6 +47,7 @@ const styles = StyleSheet.create({
   profile: {
     width: 70,
     height: 70,
+    borderRadius: 100,
   },
   welcomeText: {
     fontSize: 12,
@@ -154,15 +157,45 @@ const styles = StyleSheet.create({
 });
 
 export default function Home({ navigation }: StackProps) {
-  const { getPersistData } = useDataPersist();
+  const { getPersistData, setPersistData } = useDataPersist();
   const { user } = useAppSlice();
   const [isReady, setReady] = useState(false);
+  const [fotoUri, setFotoUri] = useState<string | null>(null);
+  const [statusCode, setStatusCode] = useState<number | null>(null);
 
   const preloadHome = async () => {
     try {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
       if (token) {
         console.log('User Token found:', token);
+        const foto = await axios.post(
+          `${config.API_URL}/api/user/download`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token.access_token}`,
+            },
+            responseType: 'blob',
+          },
+        );
+        const ImageUrl = URL.createObjectURL(foto.data);
+        setFotoUri(ImageUrl);
+
+        const accessToken = foto.headers['access-token'];
+        foto.headers.access_token = accessToken;
+        delete foto.headers['access-token'];
+
+        setStatusCode(foto.status);
+        // console.log('header foto', headers);
+        // console.log('headera asli foto', foto.headers);
+
+        if (foto.status == 200) {
+          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, foto.headers);
+          if (SimpanToken) {
+            console.log('Token Dari Foto berhasil disimpan');
+          }
+        } else {
+        }
       } else {
         console.log('Token not found.');
       }
@@ -194,7 +227,11 @@ export default function Home({ navigation }: StackProps) {
             onPress={() => {
               navigation.navigate('UserStack', { from: 'User' });
             }}>
-            <Image source={images.profile} style={styles.profile} />
+            {statusCode === 200 && fotoUri ? (
+              <Image source={{ uri: fotoUri }} style={styles.profile} />
+            ) : (
+              <Image source={images.profile} style={styles.profile} />
+            )}
           </TouchableOpacity>
         </View>
         <View style={{ marginHorizontal: 5 }}>
