@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
 });
 
 export default function Home({ navigation }: StackProps) {
-  const { getPersistData, setPersistData } = useDataPersist();
-  const { user } = useAppSlice();
+  const { getPersistData, setPersistData, removeAllPersistData } = useDataPersist();
+  const { dispatch, reset, user } = useAppSlice();
   const [isReady, setReady] = useState(false);
   const [fotoUri, setFotoUri] = useState<string | null>(null);
   const [statusCode, setStatusCode] = useState<number | null>(null);
@@ -171,6 +171,7 @@ export default function Home({ navigation }: StackProps) {
   const preloadHome = async () => {
     try {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+      console.log('User Token found 0:', token);
       if (token) {
         console.log('User Token found:', token);
         try {
@@ -192,17 +193,18 @@ export default function Home({ navigation }: StackProps) {
           delete foto.headers['access-token'];
 
           setStatusCode(foto.status);
+          console.log('data foto', foto.headers);
           // console.log('header foto', headers);
           // console.log('headera asli foto', foto.headers);
 
-          if (foto.status === 200 || foto.status === 404) {
+          if (foto.status === 200) {
             const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, foto.headers);
             if (SimpanToken) {
               console.log('Token Dari Foto berhasil disimpan');
             }
           } else {
-            Alert.alert('Error Internet', `Silahkan Login Kembali`, [
-              { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+            Alert.alert('Error Internet 1', `Silahkan Login Kembali`, [
+              { text: 'OK', onPress: handleLogout },
             ]);
           }
         } catch (err) {
@@ -230,24 +232,41 @@ export default function Home({ navigation }: StackProps) {
           } else {
             // Menangani error lainnya
             console.log('[##] preload error Home:', err);
-            Alert.alert('Error Server', 'Silahkan login kembali', [
-              { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+            Alert.alert('Error Server 1', 'Silahkan login kembali', [
+              { text: 'OK', onPress: handleLogout },
             ]);
           }
         }
       } else {
-        Alert.alert('Error Internet', 'Silahkan login kembali', [
-          { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+        Alert.alert('Error Internet 2', 'Silahkan login kembali', [
+          { text: 'OK', onPress: handleLogout },
         ]);
       }
     } catch (err) {
       // Menangani error yang terjadi saat mengambil token
       console.log('[##] preload error Home:', err);
-      Alert.alert('Error Server', 'Silahkan login kembali', [
-        { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+      Alert.alert('Error Server 2', 'Silahkan login kembali', [
+        { text: 'OK', onPress: handleLogout },
       ]);
     } finally {
       setReady(true);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Hapus data pengguna dari penyimpanan persisten
+      const hapusDataLogin = await removeAllPersistData();
+      if (hapusDataLogin) {
+        console.log('Berhasil menghapus data pengguna.');
+        // Reset status login dan hapus data pengguna dari store Redux
+        dispatch(reset());
+        Alert.alert('Logout Berhasil', `Berhasil Keluar akun`);
+      } else {
+        console.error('Gagal megnhapus data pengguna.');
+      }
+    } catch (error) {
+      console.log('Logout error:', error);
     }
   };
 
@@ -257,9 +276,10 @@ export default function Home({ navigation }: StackProps) {
     }, []),
   );
 
-  // if (!isReady) {
-  //   return null; // or a loading indicator
-  // }
+  if (!isReady) {
+    return null; // or a loading indicator
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />

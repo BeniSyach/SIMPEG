@@ -69,8 +69,6 @@ const Login = () => {
         const user = await login(nik, password);
         // console.log('data', user);
         if (user) {
-          dispatch(setUser(user));
-          dispatch(setLoggedIn(true));
           const dataLogin = {
             user,
             nik,
@@ -78,14 +76,17 @@ const Login = () => {
           };
           const success = await setPersistData(DataPersistKeys.USER, dataLogin);
           if (success) {
+            console.log('user', user);
             const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, user);
             if (SimpanToken) {
-              console.log('Data pengguna berhasil disimpan.');
+              console.log('Data pengguna berhasil disimpan.', SimpanToken);
+              Alert.alert('Login Sukes', `Selamat Datang, ${user.data.nama}`);
+              dispatch(setUser(user));
+              dispatch(setLoggedIn(true));
             }
           } else {
             console.error('Gagal menyimpan data pengguna.');
           }
-          Alert.alert('Login Sukes', `Selamat Datang, ${user.data.nama}`);
         } else {
           dispatch(reset());
           Alert.alert('Login Failed', 'NIK/NIP atau Password Salah');
