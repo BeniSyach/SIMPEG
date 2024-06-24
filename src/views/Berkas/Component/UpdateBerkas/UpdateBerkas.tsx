@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import GradientButton from '@components/GradientButton';
 import { colors, fonts } from '@theme';
 import { windowWidth } from '@utils/deviceInfo';
 import FormInput from '@components/FormInput';
 import DatePicker from '@components/DatePicker';
 import DocumentPickerComponent from '@components/DokumentPicker/DokumenPicker';
+import { DataPersistKeys, useDataPersist } from '@hooks';
+import { IUser } from '@modules/app';
+import axios from 'axios';
+import config from '@utils/config';
 
 const styles = StyleSheet.create({
   root: {
@@ -102,7 +106,9 @@ type UpdateBerkasProps = {
 };
 
 export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
+  const { getPersistData, setPersistData } = useDataPersist();
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
   const [formData, setFormData] = useState({
     id: '',
@@ -113,8 +119,11 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
     tgl_akhir: '',
     file: '',
   });
-  const [unitKerjaError, DitetapkanError] = useState('');
-  const [error, setError] = useState<string>('');
+  const [JenisBerkasError, setJenisBerkasError] = useState('');
+  const [NomorBerkasError, setNomorBerkasError] = useState('');
+  const [selectedStartDateError, setselectedStartDateError] = useState('');
+  const [selectedEndDateError, setselectedEndDateError] = useState('');
+  const [FileError, setFileError] = useState('');
 
   useEffect(() => {
     setFormData(dataBerkas);
@@ -127,13 +136,87 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
     });
   };
 
-  const handleDateChange = (date: Date) => {
+  const handleStartDateChange = (date: Date) => {
     setSelectedStartDate(date);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    setSelectedEndDate(date);
   };
 
   const handleDocumentPicked = (document: any) => {
     setSelectedDocument(document);
-    setError(''); // Clear error when a document is selected
+  };
+
+  const handleSubmit = async () => {
+    let valid = true;
+    if (!formData.jenis_berkas || formData.jenis_berkas === '') {
+      setJenisBerkasError('Jenis Berkas Harus Diisi');
+      valid = false;
+    } else if (!formData.nomor_berkas || formData.nomor_berkas === '') {
+      setNomorBerkasError('Nomor Berkas Harus Diisi');
+      valid = false;
+    } else if (!selectedStartDate) {
+      setselectedStartDateError('Tanggal Mulai Harus Dipilih');
+      valid = false;
+    } else if (!selectedEndDate) {
+      setselectedEndDateError('Tanggal Akhir Harus Dipilih');
+      valid = false;
+    } else if (!formData.file) {
+      setFileError('File Harus Dipilih');
+      valid = false;
+    } else {
+      if (valid) {
+        const formDataUpdate = new FormData();
+        try {
+          const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+          if (token) {
+            formDataUpdate.append('jenis_berkas', formData.jenis_berkas);
+            formDataUpdate.append('nomor_berkas', formData.nomor_berkas);
+            formDataUpdate.append('tgl_mulai', selectedStartDate.toDateString());
+            formDataUpdate.append('tgl_akhir', selectedEndDate.toDateString());
+            if (selectedDocument) {
+              console.log('data foto', selectedDocument);
+              // Mendapatkan nama file dari URI
+              const fileName = selectedDocument.split('/').pop() || 'file.pdf';
+
+              formDataUpdate.append('file', {
+                uri: selectedDocument,
+                name: fileName,
+                type: 'application/pdf',
+              } as any);
+            }
+            const updateBerkas = await axios.post(
+              `${config.API_URL}/berkas/update/${formData.id}`,
+              {
+                formDataUpdate,
+              },
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                  Authorization: `Bearer ${token.access_token}`,
+                },
+              },
+            );
+            const success = updateBerkas.data;
+            if (success.status === 'success') {
+              const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
+              if (SimpanToken) {
+                console.log('data lokasi berhasil disimpan');
+                Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
+                  { text: 'OK', onPress: onClose },
+                ]);
+              }
+            } else {
+              Alert.alert('Gagal !!!', `Data Gagal Tersimpan`, [{ text: 'OK', onPress: onClose }]);
+            }
+          }
+        } catch (err) {
+          console.log('Update Berkas error:', err);
+          Alert.alert('Gagal', `Data Gagal Tersimpan`, [{ text: 'OK', onPress: onClose }]);
+        }
+      }
+    }
   };
 
   return (
@@ -144,32 +227,32 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
           label="Jenis Berkas"
           defaultValue={formData.jenis_berkas}
           onChangeText={text => handleInputChange('jenis_berkas', text)}
-          error={unitKerjaError}
+          error={JenisBerkasError}
         />
         <FormInput
           label="Nomor Berkas"
           defaultValue={formData.nomor_berkas}
           onChangeText={text => handleInputChange('nomor_berkas', text)}
-          error={unitKerjaError}
+          error={NomorBerkasError}
         />
 
         <Text style={styles.selectedDateText}>Tanggal Mulai : </Text>
         <DatePicker
-          onDateChange={handleDateChange}
-          error={error}
+          onDateChange={handleStartDateChange}
+          error={selectedStartDateError}
           value={formData.tgl_mulai ? formData.tgl_mulai.toString().split('T')[0] : undefined}
         />
 
         <Text style={[styles.selectedDateText, { marginVertical: 15 }]}>Tanggal Akhir : </Text>
         <DatePicker
-          onDateChange={handleDateChange}
-          error={error}
+          onDateChange={handleEndDateChange}
+          error={selectedEndDateError}
           value={formData.tgl_akhir ? formData.tgl_akhir.toString().split('T')[0] : undefined}
         />
 
         <DocumentPickerComponent
           onDocumentPicked={handleDocumentPicked}
-          error={error}
+          error={FileError}
           style={styles.customDocumentPickerStyle}
           textStyle={styles.customTextStyle}
           errorTextStyle={styles.customErrorTextStyle}
@@ -189,7 +272,7 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
               start: { x: 0, y: 1 },
               end: { x: 0.8, y: 0 },
             }}
-            onPress={onClose}
+            onPress={handleSubmit}
           />
           <GradientButton
             title="Batal"

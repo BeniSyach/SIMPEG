@@ -83,7 +83,6 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
         setTokenLama(token.access_token);
         console.log('User Token found:', token);
         const PangkatGaji = await getPangkatGaji(token.access_token);
-        console.log('data Pangkat Gaji', PangkatGaji?.data[0].nomor_sk);
         if (PangkatGaji) {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, PangkatGaji);
           if (SimpanToken) {

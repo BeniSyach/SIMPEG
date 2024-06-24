@@ -119,12 +119,10 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
 
   const handleDateStartChange = (date: Date) => {
     setSelectedDate(date);
-    setErrorTglMulai(''); // Clear error when a date is selected
   };
 
   const handleDateEndChange = (date: Date) => {
     setSelectedEndDate(date);
-    setErrorTglAkhir(''); // Clear error when a date is selected
   };
 
   const handleSubmit = async () => {
@@ -146,20 +144,48 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
       valid = false;
     } else {
       if (valid) {
+        const formDataPost = new FormData();
         try {
           const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
           if (token) {
+            formDataPost.append('jenis_berkas', formData.jenis_berkas);
+            formDataPost.append('nomor_berkas', formData.nomor_berkas);
+            formDataPost.append('tgl_mulai', selectedDate.toDateString());
+            formDataPost.append('tgl_akhir', selectedEndDate.toDateString());
+            if (selectedDocument) {
+              console.log('data foto', selectedDocument);
+              // Mendapatkan nama file dari URI
+              const fileName = selectedDocument.split('/').pop() || 'file.pdf';
+
+              formDataPost.append('file', {
+                uri: selectedDocument,
+                name: fileName,
+                type: 'application/pdf',
+              } as any);
+            }
             const addBerkas = await axios.post(
               `${config.API_URL}/api/berkas/create`,
-              {},
+              {
+                formDataPost,
+              },
               {
                 headers: {
+                  'Content-Type': 'multipart/form-data',
                   Authorization: `Bearer ${token.access_token}`,
                 },
               },
             );
             const resAddBerkas = addBerkas.data;
             if (resAddBerkas.status === 'success') {
+              const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, resAddBerkas);
+              if (SimpanToken) {
+                console.log('data lokasi berhasil disimpan');
+                Alert.alert('Simpan Data Sukes', `Data Berhasil Disimpan`, [
+                  { text: 'OK', onPress: onClose },
+                ]);
+              }
+            } else {
+              Alert.alert('Gagal !!!', `Data Gagal Tersimpan`, [{ text: 'OK', onPress: onClose }]);
             }
           }
           // Lakukan sesuatu dengan tanggal yang dipilih

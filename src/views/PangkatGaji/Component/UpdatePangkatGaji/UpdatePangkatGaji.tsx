@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Alert } from 'react-native';
 import GradientButton from '@components/GradientButton';
 import { colors, fonts } from '@theme';
 import { windowWidth } from '@utils/deviceInfo';
 import config from '@utils/config';
 import FormInput from '@components/FormInput';
+import DatePicker from '@components/DatePicker';
+import { DataPersistKeys, useDataPersist } from '@hooks';
+import { IUser } from '@modules/app';
+import axios from 'axios';
 
 const styles = StyleSheet.create({
   root: {
@@ -68,6 +72,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  selectedDateText: {
+    marginBottom: 5,
+    fontSize: 14,
+  },
 });
 
 type UpdatePangkatGajiProps = {
@@ -90,6 +98,7 @@ type UpdatePangkatGajiProps = {
 };
 
 export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGajiProps) {
+  const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
     nik: 0,
@@ -105,7 +114,34 @@ export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGaj
     masa_kerja_gaji_bulan: '',
     gaji_pokok: '',
   });
-  const [unitKerjaError, DitetapkanError] = useState('');
+
+  const [TanggalSkDate, setSelectedTanggalSkDate] = useState<Date | null>(null);
+  const [TmtPangkatDate, setSelectedTmtPangkatDate] = useState<Date | null>(null);
+  const [TmtGajiBerkalaDate, setSelectedTmtGajiBerkalaDate] = useState<Date | null>(null);
+
+  const [DitetapkanError, setDitetapkanError] = useState('');
+  const [NomorSkError, setNomorSkError] = useState('');
+  const [TglSkError, setTglSkError] = useState('');
+  const [TmtPangkatError, setTmtPangkatError] = useState('');
+  const [GolonganRuangError, setGolonganRuangError] = useState('');
+  const [MasaKerjaTahunError, setMasaKerjaTahunError] = useState('');
+  const [MasaKerjaBulanError, setMasaKerjaBulanError] = useState('');
+  const [TmtGajiBerkalaError, setTmtGajiBerkalaError] = useState('');
+  const [MasaKerjaGajiTahunError, setMasaKerjaGajiTahunError] = useState('');
+  const [MasaKerjaGajiBulanError, setMasaKerjaGajiBulanError] = useState('');
+  const [GajiError, setGajiError] = useState('');
+
+  const handleDateTanggalSKChange = (date: Date) => {
+    setSelectedTanggalSkDate(date);
+  };
+
+  const handleDateTmtPangkatChange = (date: Date) => {
+    setSelectedTmtPangkatDate(date);
+  };
+
+  const handleDateTmtGajiBerkalaChange = (date: Date) => {
+    setSelectedTmtGajiBerkalaDate(date);
+  };
 
   useEffect(() => {
     setFormData(DataPangkatGaji); // Initialize form data with DataPangkatGaji
@@ -118,6 +154,100 @@ export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGaj
     });
   };
 
+  const handleSubmit = async () => {
+    let valid = true;
+    if (!formData.ditetapkan || formData.ditetapkan === '') {
+      setDitetapkanError('Ditetapkan Harus Diisi');
+      valid = false;
+    } else if (!formData.nomor_sk || formData.nomor_sk === '') {
+      setNomorSkError('Nomor SK Harus Diisi');
+      valid = false;
+    } else if (!TanggalSkDate) {
+      setTglSkError('Tanggal SK harus diisi');
+      valid = false;
+    } else if (!TmtPangkatDate) {
+      setTmtPangkatError('TMT Pangkat harus diisi');
+      valid = false;
+    } else if (!formData.golongan_ruang || formData.golongan_ruang === '') {
+      setGolonganRuangError('Golongan Ruang harus diisi');
+      valid = false;
+    } else if (!formData.masa_kerja_tahun || formData.masa_kerja_tahun === '') {
+      setMasaKerjaTahunError('Masa Kerja Tahun harus diisi');
+      valid = false;
+    } else if (!/^\d+$/.test(formData.masa_kerja_tahun)) {
+      setMasaKerjaTahunError('Masa Kerja Tahun Harus Angka');
+      valid = false;
+    } else if (!formData.masa_kerja_bulan || formData.masa_kerja_bulan === '') {
+      setMasaKerjaBulanError('Masa Kerja Bulan harus diisi');
+      valid = false;
+    } else if (!/^\d+$/.test(formData.masa_kerja_bulan)) {
+      setMasaKerjaBulanError('Masa Kerja Bulan Harus Angka');
+      valid = false;
+    } else if (!TmtGajiBerkalaDate) {
+      setTmtGajiBerkalaError('TMT Gaji Berkala harus diisi');
+      valid = false;
+    } else if (!formData.masa_kerja_gaji_tahun || formData.masa_kerja_gaji_tahun === '') {
+      setMasaKerjaGajiTahunError('Masa Kerja Gaji Tahun harus diisi');
+      valid = false;
+    } else if (!/^\d+$/.test(formData.masa_kerja_gaji_tahun)) {
+      setMasaKerjaGajiTahunError('Masa Kerja Gaji Tahun Harus Angka');
+      valid = false;
+    } else if (!formData.masa_kerja_gaji_bulan || formData.masa_kerja_gaji_bulan === '') {
+      setMasaKerjaGajiBulanError('Masa Kerja Gaji Bulan harus diisi');
+      valid = false;
+    } else if (!/^\d+$/.test(formData.masa_kerja_gaji_bulan)) {
+      setMasaKerjaGajiBulanError('Masa Kerja Gaji Bulan Harus Angka');
+      valid = false;
+    } else if (!formData.gaji_pokok || formData.gaji_pokok === '') {
+      setGajiError('Gaji Pokok harus diisi');
+      valid = false;
+    } else if (!/^\d+$/.test(formData.gaji_pokok)) {
+      setGajiError('Gaji Pokok Harus Angka');
+      valid = false;
+    } else {
+      if (valid) {
+        try {
+          const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+          if (token) {
+            const updatePangkatGaji = await axios.post(
+              `${config.API_URL}/api/pangkat-gaji/create`,
+              {
+                ditetapkan: formData.ditetapkan,
+                nomor_sk: formData.nomor_sk,
+                tgl_sk: TanggalSkDate,
+                tmt_pangkat: TmtPangkatDate,
+                golongan_ruang: formData.golongan_ruang,
+                masa_kerja_tahun: formData.masa_kerja_tahun,
+                masa_kerja_bulan: formData.masa_kerja_bulan,
+                tmt_gaji_berkala: TmtGajiBerkalaDate,
+                masa_kerja_gaji_tahun: formData.masa_kerja_gaji_tahun,
+                masa_kerja_gaji_bulan: formData.masa_kerja_gaji_bulan,
+                gaji_pokok: formData.gaji_pokok,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token.access_token}`,
+                },
+              },
+            );
+            const resUpdatePangkatGaji = updatePangkatGaji.data;
+            if (resUpdatePangkatGaji.status === 'success') {
+              const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, resUpdatePangkatGaji);
+              if (SimpanToken) {
+                console.log('data Pangkat Gaji berhasil Diubah');
+                Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
+                  { text: 'OK', onPress: onClose },
+                ]);
+              }
+            }
+          }
+        } catch (error) {
+          console.log('## Update Gaji Pangkat', error);
+        }
+      }
+    }
+  };
+
   return (
     <View style={styles.root}>
       <Text style={styles.title}>Update Data Pangkat Gaji</Text>
@@ -126,68 +256,90 @@ export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGaj
           label="Ditetapkan"
           defaultValue={formData.ditetapkan}
           onChangeText={text => handleInputChange('ditetapkan', text)}
-          error={unitKerjaError}
+          error={DitetapkanError}
         />
+
         <FormInput
           label="Nomor SK"
           defaultValue={formData.nomor_sk}
           onChangeText={text => handleInputChange('nomor_sk', text)}
-          error={unitKerjaError}
+          error={NomorSkError}
         />
-        <FormInput
-          label="Tanggal SK"
-          defaultValue={formData.tgl_sk}
-          onChangeText={text => handleInputChange('tgl_sk', text)}
-          error={unitKerjaError}
+
+        <Text style={styles.selectedDateText}>Tanggal SK : </Text>
+        <DatePicker
+          onDateChange={handleDateTanggalSKChange}
+          error={TglSkError}
+          value={formData.tgl_sk ? formData.tgl_sk.toString().split('T')[0] : undefined}
         />
-        <FormInput
-          label="TMT Pangkat"
-          defaultValue={formData.tmt_pangkat}
-          onChangeText={text => handleInputChange('tmt_pangkat', text)}
-          error={unitKerjaError}
+
+        <Text style={[styles.selectedDateText, { marginVertical: 15 }]}>TMT Pangkat : </Text>
+        <DatePicker
+          onDateChange={handleDateTmtPangkatChange}
+          error={TmtPangkatError}
+          value={formData.tmt_pangkat ? formData.tmt_pangkat.toString().split('T')[0] : undefined}
         />
+
         <FormInput
           label="Golongan Ruang"
           defaultValue={formData.golongan_ruang}
           onChangeText={text => handleInputChange('golongan_ruang', text)}
-          error={unitKerjaError}
+          error={GolonganRuangError}
+          style={{ marginTop: 15 }}
         />
+
         <FormInput
           label="Masa Kerja Tahun"
           defaultValue={formData.masa_kerja_tahun}
           onChangeText={text => handleInputChange('masa_kerja_tahun', text)}
-          error={unitKerjaError}
+          error={MasaKerjaTahunError}
+          keyboardType="numeric"
         />
+
         <FormInput
           label="Masa Kerja Bulan"
           defaultValue={formData.masa_kerja_bulan}
           onChangeText={text => handleInputChange('masa_kerja_bulan', text)}
-          error={unitKerjaError}
+          error={MasaKerjaBulanError}
+          keyboardType="numeric"
         />
-        <FormInput
-          label="TMT Gaji Berkala"
-          defaultValue={formData.tmt_gaji_berkala}
-          onChangeText={text => handleInputChange('tmt_gaji_berkala', text)}
-          error={unitKerjaError}
+
+        <Text style={[styles.selectedDateText]}>TMT Gaji Berkala : </Text>
+        <DatePicker
+          onDateChange={handleDateTmtGajiBerkalaChange}
+          error={TmtGajiBerkalaError}
+          value={
+            formData.tmt_gaji_berkala
+              ? formData.tmt_gaji_berkala.toString().split('T')[0]
+              : undefined
+          }
         />
+
         <FormInput
           label="Masa Kerja Gaji Tahun"
           defaultValue={formData.masa_kerja_gaji_tahun}
           onChangeText={text => handleInputChange('masa_kerja_gaji_tahun', text)}
-          error={unitKerjaError}
+          error={MasaKerjaGajiTahunError}
+          style={{ marginTop: 15 }}
+          keyboardType="numeric"
         />
+
         <FormInput
           label="Masa Kerja Gaji Bulan"
           defaultValue={formData.masa_kerja_gaji_bulan}
           onChangeText={text => handleInputChange('masa_kerja_gaji_bulan', text)}
-          error={unitKerjaError}
+          error={MasaKerjaGajiBulanError}
+          keyboardType="numeric"
         />
+
         <FormInput
           label="Gaji Pokok"
           defaultValue={formData.gaji_pokok}
           onChangeText={text => handleInputChange('gaji_pokok', text)}
-          error={unitKerjaError}
+          error={GajiError}
+          keyboardType="numeric"
         />
+
         <View style={{ flexDirection: 'row' }}>
           <GradientButton
             title="OK"
@@ -198,7 +350,7 @@ export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGaj
               start: { x: 0, y: 1 },
               end: { x: 0.8, y: 0 },
             }}
-            onPress={onClose}
+            onPress={handleSubmit}
           />
           <GradientButton
             title="Batal"
