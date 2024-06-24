@@ -4,6 +4,8 @@ import GradientButton from '@components/GradientButton';
 import { colors, fonts } from '@theme';
 import { windowWidth } from '@utils/deviceInfo';
 import FormInput from '@components/FormInput';
+import DatePicker from '@components/DatePicker';
+import DocumentPickerComponent from '@components/DokumentPicker/DokumenPicker';
 
 const styles = StyleSheet.create({
   root: {
@@ -14,8 +16,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.openSan.bold,
     color: colors.black,
-    marginTop: 16,
-    marginBottom: 10,
     width: '100%',
     textAlign: 'center',
   },
@@ -67,6 +67,25 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  selectedDateText: {
+    marginBottom: 5,
+    fontSize: 14,
+  },
+  customDocumentPickerStyle: {
+    marginTop: 20,
+    borderColor: 'green',
+  },
+  customTextStyle: {
+    color: 'blue',
+    fontSize: 18,
+  },
+  customErrorTextStyle: {
+    color: 'orange',
+  },
+  selectedDocumentText: {
+    marginTop: 20,
+    fontSize: 16,
+  },
 });
 
 type UpdateBerkasProps = {
@@ -83,6 +102,8 @@ type UpdateBerkasProps = {
 };
 
 export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
   const [formData, setFormData] = useState({
     id: '',
     nik: 0,
@@ -93,9 +114,10 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
     file: '',
   });
   const [unitKerjaError, DitetapkanError] = useState('');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    setFormData(dataBerkas); // Initialize form data with dataBerkas
+    setFormData(dataBerkas);
   }, [dataBerkas]);
 
   const handleInputChange = (name: string, value: string) => {
@@ -103,6 +125,15 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleDateChange = (date: Date) => {
+    setSelectedStartDate(date);
+  };
+
+  const handleDocumentPicked = (document: any) => {
+    setSelectedDocument(document);
+    setError(''); // Clear error when a document is selected
   };
 
   return (
@@ -121,24 +152,33 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
           onChangeText={text => handleInputChange('nomor_berkas', text)}
           error={unitKerjaError}
         />
-        <FormInput
-          label="Tanggal Mulai"
-          defaultValue={formData.tgl_mulai}
-          onChangeText={text => handleInputChange('tgl_mulai', text)}
-          error={unitKerjaError}
+
+        <Text style={styles.selectedDateText}>Tanggal Mulai : </Text>
+        <DatePicker
+          onDateChange={handleDateChange}
+          error={error}
+          value={formData.tgl_mulai ? formData.tgl_mulai.toString().split('T')[0] : undefined}
         />
-        <FormInput
-          label="Tanggal Akhir"
-          defaultValue={formData.tgl_akhir}
-          onChangeText={text => handleInputChange('tgl_akhir', text)}
-          error={unitKerjaError}
+
+        <Text style={[styles.selectedDateText, { marginVertical: 15 }]}>Tanggal Akhir : </Text>
+        <DatePicker
+          onDateChange={handleDateChange}
+          error={error}
+          value={formData.tgl_akhir ? formData.tgl_akhir.toString().split('T')[0] : undefined}
         />
-        <FormInput
-          label="File"
-          defaultValue={formData.file}
-          onChangeText={text => handleInputChange('file', text)}
-          error={unitKerjaError}
+
+        <DocumentPickerComponent
+          onDocumentPicked={handleDocumentPicked}
+          error={error}
+          style={styles.customDocumentPickerStyle}
+          textStyle={styles.customTextStyle}
+          errorTextStyle={styles.customErrorTextStyle}
         />
+        {selectedDocument && (
+          <Text style={styles.selectedDocumentText}>
+            Selected Document: {selectedDocument.name}
+          </Text>
+        )}
         <View style={{ flexDirection: 'row' }}>
           <GradientButton
             title="OK"

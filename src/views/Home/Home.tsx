@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   TouchableOpacity,
-  Image,
   SafeAreaView,
   StatusBar,
+  Image as ImageReact,
+  Alert,
 } from 'react-native';
 import { StackProps } from '@navigator/stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser, useAppSlice } from '@modules/app';
 import axios from 'axios';
 import config from '@utils/config';
+import Image from '@components/Image';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,11 +41,13 @@ const styles = StyleSheet.create({
   welcome: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
     backgroundColor: '#39378A',
   },
   foto_profile: {
     borderRadius: 50,
+    marginRight: 3,
   },
   profile: {
     width: 70,
@@ -55,7 +60,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -168,52 +173,93 @@ export default function Home({ navigation }: StackProps) {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
       if (token) {
         console.log('User Token found:', token);
-        const foto = await axios.post(
-          `${config.API_URL}/api/user/download`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token.access_token}`,
+        try {
+          const foto = await axios.post(
+            `${config.API_URL}/api/user/download`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token.access_token}`,
+              },
+              responseType: 'blob',
             },
-            responseType: 'blob',
-          },
-        );
-        const ImageUrl = URL.createObjectURL(foto.data);
-        setFotoUri(ImageUrl);
+          );
+          const ImageUrl = URL.createObjectURL(foto.data);
+          setFotoUri(ImageUrl);
 
-        const accessToken = foto.headers['access-token'];
-        foto.headers.access_token = accessToken;
-        delete foto.headers['access-token'];
+          const accessToken = foto.headers['access-token'];
+          foto.headers.access_token = accessToken;
+          delete foto.headers['access-token'];
 
-        setStatusCode(foto.status);
-        // console.log('header foto', headers);
-        // console.log('headera asli foto', foto.headers);
+          setStatusCode(foto.status);
+          // console.log('header foto', headers);
+          // console.log('headera asli foto', foto.headers);
 
-        if (foto.status == 200) {
-          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, foto.headers);
-          if (SimpanToken) {
-            console.log('Token Dari Foto berhasil disimpan');
+          if (foto.status === 200 || foto.status === 404) {
+            const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, foto.headers);
+            if (SimpanToken) {
+              console.log('Token Dari Foto berhasil disimpan');
+            }
+          } else {
+            Alert.alert('Error Internet', `Silahkan Login Kembali`, [
+              { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+            ]);
           }
-        } else {
+        } catch (err) {
+          if (axios.isAxiosError(err) && err.response?.status === 404) {
+            // Menangani khusus untuk status 404
+            console.log('Status 404 ditemukan, tidak masalah.');
+            setStatusCode(404);
+
+            // Mengambil data dari respons 404
+            const responseBlob = err.response?.data;
+            if (responseBlob) {
+              const responseText = await new Response(responseBlob).text();
+              const responseData = JSON.parse(responseText);
+              console.log('Data dari respons 404:', responseData);
+
+              // Menyimpan token baru dari data respons
+              if (responseData?.access_token) {
+                const newToken = { access_token: responseData.access_token };
+                const simpanToken = await setPersistData(DataPersistKeys.TOKEN, newToken);
+                if (simpanToken) {
+                  console.log('Token baru dari respons 404 berhasil disimpan', newToken);
+                }
+              }
+            }
+          } else {
+            // Menangani error lainnya
+            console.log('[##] preload error Home:', err);
+            Alert.alert('Error Server', 'Silahkan login kembali', [
+              { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+            ]);
+          }
         }
       } else {
-        console.log('Token not found.');
+        Alert.alert('Error Internet', 'Silahkan login kembali', [
+          { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+        ]);
       }
     } catch (err) {
+      // Menangani error yang terjadi saat mengambil token
       console.log('[##] preload error Home:', err);
-      // hide splash screen
+      Alert.alert('Error Server', 'Silahkan login kembali', [
+        { text: 'OK', onPress: () => navigation.replace('LoginStack') },
+      ]);
     } finally {
       setReady(true);
     }
   };
 
-  useEffect(() => {
-    preloadHome();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      preloadHome();
+    }, []),
+  );
 
-  if (!isReady) {
-    return null; // or a loading indicator
-  }
+  // if (!isReady) {
+  //   return null; // or a loading indicator
+  // }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -228,15 +274,17 @@ export default function Home({ navigation }: StackProps) {
               navigation.navigate('UserStack', { from: 'User' });
             }}>
             {statusCode === 200 && fotoUri ? (
-              <Image source={{ uri: fotoUri }} style={styles.profile} />
+              <ImageReact source={{ uri: fotoUri }} style={styles.profile} />
             ) : (
               <Image source={images.profile} style={styles.profile} />
             )}
           </TouchableOpacity>
         </View>
-        <View style={{ marginHorizontal: 5 }}>
+        <View style={{ flex: 1, marginHorizontal: 5 }}>
           <Text style={styles.welcomeText}>Halo, Selamat Datang</Text>
-          <Text style={styles.userName}>{user?.data.nama}</Text>
+          <Text numberOfLines={1} style={styles.userName}>
+            {user?.data.nama}
+          </Text>
           <Text style={styles.userPosition}>{user?.data.nik}</Text>
         </View>
 

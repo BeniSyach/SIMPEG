@@ -35,7 +35,7 @@ export function useAppService() {
 
       return null;
     } catch (err) {
-      console.log('Failed to fetch user:', err);
+      console.log('Failed to fetch Login:', err);
       return Promise.reject(err);
     }
   }

@@ -1,5 +1,5 @@
 // DatePicker.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '@theme'; // Pastikan impor colors sesuai dengan struktur direktori Anda
@@ -28,9 +28,10 @@ const styles = StyleSheet.create({
 interface DatePickerProps {
   onDateChange: (date: Date) => void;
   error?: string;
+  value?: string;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ onDateChange, error }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ onDateChange, error, value }) => {
   const [date, setDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -48,6 +49,18 @@ const DatePicker: React.FC<DatePickerProps> = ({ onDateChange, error }) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  useEffect(() => {
+    if (value) {
+      // Parse nilai dari API menjadi objek Date
+      const parts = value.split('/');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+      const year = parseInt(parts[2], 10);
+      const parsedDate = new Date(year, month, day);
+      setDate(parsedDate);
+    }
+  }, [value]);
 
   return (
     <View style={styles.container}>

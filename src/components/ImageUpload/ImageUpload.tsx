@@ -11,7 +11,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { colors } from '@theme';
+
+const MAX_IMAGE_SIZE_MB = 1;
 
 const styles = StyleSheet.create({
   container: {
@@ -59,6 +62,25 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
 
+  const resizeImageIfNeeded = async (uri: string) => {
+    // Get file info
+    const fileInfo = await fetch(uri).then(response => response.blob());
+
+    // Check if file size is greater than 1 MB
+    if (fileInfo.size / 1024 / 1024 > MAX_IMAGE_SIZE_MB) {
+      // Resize image
+      const manipulatedImage = await manipulateAsync(
+        uri,
+        [{ resize: { width: 1200, height: 900 } }],
+        { compress: 0.7, format: SaveFormat.JPEG },
+      );
+
+      return manipulatedImage.uri;
+    }
+
+    return uri;
+  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -69,8 +91,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     if (!result.canceled) {
       const selectedUri = result.assets[0].uri;
-      setImageUri(selectedUri);
-      onImageSelected(selectedUri); // Panggil callback dengan URI gambar yang dipilih
+      const resizedUri = await resizeImageIfNeeded(selectedUri);
+      setImageUri(resizedUri);
+      onImageSelected(resizedUri); // Panggil callback dengan URI gambar yang dipilih
     }
   };
 

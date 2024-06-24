@@ -6,6 +6,10 @@ import { windowWidth } from '@utils/deviceInfo';
 import FormInput from '@components/FormInput';
 import DatePicker from '@components/DatePicker';
 import DocumentPickerComponent from '@components/DokumentPicker/DokumenPicker';
+import axios from 'axios';
+import config from '@utils/config';
+import { IUser } from '@modules/app';
+import { DataPersistKeys, useDataPersist } from '@hooks';
 
 const styles = StyleSheet.create({
   root: {
@@ -94,6 +98,7 @@ type AddBerkasProps = {
 };
 
 export function AddBerkas({ onClose }: AddBerkasProps) {
+  const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
     nik: 0,
@@ -103,49 +108,76 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
     tgl_akhir: '',
     file: '',
   });
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
-  const [error, setError] = useState<string>('');
+  const [errorJenisBerkas, setErrorJenisBerkas] = useState<string>('');
+  const [errorNomorBerkas, setErrorNomorBerkas] = useState<string>('');
+  const [errorTglMulai, setErrorTglMulai] = useState<string>('');
+  const [errorTglAkhir, setErrorTglAkhir] = useState<string>('');
+  const [errorFile, setErrorFile] = useState<string>('');
 
   const handleDateStartChange = (date: Date) => {
     setSelectedDate(date);
-    setError(''); // Clear error when a date is selected
+    setErrorTglMulai(''); // Clear error when a date is selected
   };
 
   const handleDateEndChange = (date: Date) => {
     setSelectedEndDate(date);
-    setError(''); // Clear error when a date is selected
+    setErrorTglAkhir(''); // Clear error when a date is selected
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let valid = true;
-    if (!selectedDate) {
-      setError('Tanggal harus diisi');
+    if (!formData.jenis_berkas || formData.jenis_berkas === '') {
+      setErrorJenisBerkas('Jenis Berkas Harus Diisi');
+      valid = false;
+    } else if (!formData.nomor_berkas || formData.nomor_berkas === '') {
+      setErrorNomorBerkas('Nomor Berkas Harus Diisi');
+      valid = false;
+    } else if (!selectedDate) {
+      setErrorTglMulai('Tanggal Mulai harus diisi');
       valid = false;
     } else if (!selectedEndDate) {
-      setError('Tanggal harus diisi');
+      setErrorTglAkhir('Tanggal Akhir harus diisi');
       valid = false;
     } else if (!selectedDocument) {
-      setError('Dokumen harus diisi');
+      setErrorFile('Dokumen harus diisi');
       valid = false;
     } else {
-      // Lakukan sesuatu dengan tanggal yang dipilih
-      console.log('Tanggal yang dipilih:', selectedDate);
-      console.log('Dokumen yang dipilih:', selectedDocument);
-      Alert.alert('Dokumen Terpilih', `Nama Dokumen: ${selectedDocument.name}`);
+      if (valid) {
+        try {
+          const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+          if (token) {
+            const addBerkas = await axios.post(
+              `${config.API_URL}/api/berkas/create`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${token.access_token}`,
+                },
+              },
+            );
+            const resAddBerkas = addBerkas.data;
+            if (resAddBerkas.status === 'success') {
+            }
+          }
+          // Lakukan sesuatu dengan tanggal yang dipilih
+          console.log('Tanggal yang dipilih:', selectedDate);
+          console.log('Dokumen yang dipilih:', selectedDocument);
+        } catch (error) {
+          console.log('## post Berkas', error);
+        }
+      }
     }
   };
 
-  const formatDate = (date: Date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  const [unitKerjaError, DitetapkanError] = useState('');
+  // const formatDate = (date: Date) => {
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  //   const year = date.getFullYear();
+  //   return `${day}/${month}/${year}`;
+  // };
 
   const handleInputChange = (name: string, value: string) => {
     setFormData({
@@ -156,36 +188,36 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
 
   const handleDocumentPicked = (document: any) => {
     setSelectedDocument(document);
-    setError(''); // Clear error when a document is selected
+    setErrorFile(''); // Clear error when a document is selected
   };
 
   return (
     <View style={styles.root}>
-      <Text style={styles.title}>Tambah Data Gaji Pangkat </Text>
+      <Text style={styles.title}>Tambah Data Berkas </Text>
       <View style={styles.form}>
         <FormInput
           label="Jenis Berkas"
           defaultValue={formData.jenis_berkas}
           onChangeText={text => handleInputChange('jenis_berkas', text)}
-          error={unitKerjaError}
+          error={errorJenisBerkas}
         />
 
         <FormInput
           label="Nomor Berkas"
           defaultValue={formData.nomor_berkas}
           onChangeText={text => handleInputChange('nomor_berkas', text)}
-          error={unitKerjaError}
+          error={errorNomorBerkas}
         />
 
         <Text style={styles.selectedDateText}>Tanggal Mulai : </Text>
-        <DatePicker onDateChange={handleDateStartChange} error={error} />
+        <DatePicker onDateChange={handleDateStartChange} error={errorTglMulai} />
 
         <Text style={[styles.selectedDateText, { marginVertical: 15 }]}>Tanggal Akhir : </Text>
-        <DatePicker onDateChange={handleDateEndChange} error={error} />
+        <DatePicker onDateChange={handleDateEndChange} error={errorTglAkhir} />
 
         <DocumentPickerComponent
           onDocumentPicked={handleDocumentPicked}
-          error={error}
+          error={errorFile}
           style={styles.customDocumentPickerStyle}
           textStyle={styles.customTextStyle}
           errorTextStyle={styles.customErrorTextStyle}
@@ -205,7 +237,7 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
               start: { x: 0, y: 1 },
               end: { x: 0.8, y: 0 },
             }}
-            onPress={onClose}
+            onPress={handleSubmit}
           />
           <GradientButton
             title="Batal"

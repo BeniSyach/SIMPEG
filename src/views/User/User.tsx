@@ -94,6 +94,7 @@ export default function User({ navigation, route }: StackProps) {
   const [isReady, setReady] = useState(false);
   const [NamaUser, setnamaUser] = useState('');
   const [NamaUserError, setnamaUserError] = useState('');
+  const [errorImage, setErrorImage] = useState('');
   const [IdUser, setidUser] = useState('');
   const [NikUser, setNikUser] = useState(0);
   const [NipUser, setNipUser] = useState(0);
@@ -153,6 +154,9 @@ export default function User({ navigation, route }: StackProps) {
     if (!NamaUser) {
       setnamaUserError('Nama User Tidak Boleh Kosong');
       valid = false;
+    } else if (!imageUri) {
+      setErrorImage('Foto Tidak Boleh Kosong');
+      valid = false;
     } else {
       setnamaUserError('');
     }
@@ -188,9 +192,15 @@ export default function User({ navigation, route }: StackProps) {
             ]);
           }
         } else {
+          Alert.alert('Gagal !!!', `Data Gagal Tersimpan`, [
+            { text: 'OK', onPress: () => navigation.goBack() },
+          ]);
         }
       } catch (error) {
         console.log('Logout error:', error);
+        Alert.alert('Gagal', `Data Gagal Tersimpan`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
       }
     }
     setLoading(false);
@@ -212,7 +222,7 @@ export default function User({ navigation, route }: StackProps) {
           onChangeText={setnamaUser}
           error={NamaUserError}
         />
-        <ImageUpload label="Foto" onImageSelected={handleImageSelected} />
+        <ImageUpload label="Foto" onImageSelected={handleImageSelected} error={errorImage} />
         <View style={styles.buttonContainer}>
           <Button
             style={styles.button}
