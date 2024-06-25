@@ -100,7 +100,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <View style={[styles.container, style]}>
       {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
-      <Button title="Pick Image" onPress={pickImage} />
+      <Button title="Ambil Foto" onPress={pickImage} />
       {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
       {error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
     </View>

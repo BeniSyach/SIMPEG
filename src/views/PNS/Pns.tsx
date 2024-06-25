@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#B0B0B0',
     padding: 10,
     borderRadius: 20,
-    width: 50,
+    width: 100,
   },
   menu: {
     alignItems: 'center',
@@ -236,7 +236,7 @@ export default function Pns({ navigation, route }: StackProps) {
       <ScrollView>
         <StatusBar barStyle="light-content" />
         <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <Text style={styles.title}>Edit Cpns</Text>
+          <Text style={styles.title}>Edit PNS</Text>
         </View>
         <View style={styles.form}>
           <FormInput

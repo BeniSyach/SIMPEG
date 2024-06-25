@@ -17,6 +17,7 @@ import { IUser, useAppSlice } from '@modules/app';
 import axios from 'axios';
 import config from '@utils/config';
 import Image from '@components/Image';
+import * as FileSystem from 'expo-file-system';
 
 const styles = StyleSheet.create({
   container: {
@@ -185,8 +186,21 @@ export default function Home({ navigation }: StackProps) {
               responseType: 'blob',
             },
           );
-          const ImageUrl = URL.createObjectURL(foto.data);
-          setFotoUri(ImageUrl);
+          const reader = new FileReader();
+          reader.readAsDataURL(foto.data);
+          reader.onloadend = () => {
+            const base64data = reader.result as string;
+
+            // Save base64 data to a file
+            const fileUri = `${FileSystem.documentDirectory}downloaded_image_${Date.now()}.jpg`;
+            FileSystem.writeAsStringAsync(fileUri, base64data.split(',')[1], {
+              encoding: FileSystem.EncodingType.Base64,
+            }).then(() => {
+              setFotoUri(fileUri);
+            });
+          };
+          // const ImageUrl = URL.createObjectURL(foto.data);
+          // setFotoUri(ImageUrl);
 
           const accessToken = foto.headers['access-token'];
           foto.headers.access_token = accessToken;

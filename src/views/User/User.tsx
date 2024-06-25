@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#B0B0B0',
     padding: 10,
     borderRadius: 20,
-    width: 50,
+    width: 100,
   },
   menu: {
     alignItems: 'center',
@@ -183,7 +183,7 @@ export default function User({ navigation, route }: StackProps) {
           },
         });
         const success = UpdateDataLokasi.data;
-        if (success.status == 'success') {
+        if (success.status === 'success') {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
           if (SimpanToken) {
             console.log('data lokasi berhasil disimpan');
