@@ -54,8 +54,8 @@ const DocumentPickerComponent: React.FC<DocumentPickerProps> = ({
 
   const pickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({});
-    if (!result.canceled && 'type' in result) {
-      setDocument(result);
+    if (!result.canceled) {
+      setDocument(result.assets[0]);
       onDocumentPicked(result);
     }
   };

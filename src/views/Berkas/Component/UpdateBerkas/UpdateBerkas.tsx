@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   form: {
-    // backgroundColor: '#fff',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 20,
     shadowColor: '#000',
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   customTextStyle: {
     color: 'blue',
-    fontSize: 18,
+    fontSize: 14,
   },
   customErrorTextStyle: {
     color: 'orange',
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
 
 type UpdateBerkasProps = {
   onClose: () => void;
+  onSuccess: () => void;
   dataBerkas: {
     id: string;
     nik: number;
@@ -105,7 +106,7 @@ type UpdateBerkasProps = {
   };
 };
 
-export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
+export function UpdateBerkas({ onClose, onSuccess, dataBerkas }: UpdateBerkasProps) {
   const { getPersistData, setPersistData } = useDataPersist();
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
@@ -145,7 +146,14 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
   };
 
   const handleDocumentPicked = (document: any) => {
-    setSelectedDocument(document);
+    setSelectedDocument(document.assets[0]);
+  };
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const handleSubmit = async () => {
@@ -173,24 +181,21 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
           if (token) {
             formDataUpdate.append('jenis_berkas', formData.jenis_berkas);
             formDataUpdate.append('nomor_berkas', formData.nomor_berkas);
-            formDataUpdate.append('tgl_mulai', selectedStartDate.toDateString());
-            formDataUpdate.append('tgl_akhir', selectedEndDate.toDateString());
+            formDataUpdate.append('tgl_mulai', formatDate(selectedStartDate));
+            formDataUpdate.append('tgl_akhir', formatDate(selectedEndDate));
             if (selectedDocument) {
               console.log('data foto', selectedDocument);
-              // Mendapatkan nama file dari URI
-              const fileName = selectedDocument.split('/').pop() || 'file.pdf';
 
               formDataUpdate.append('file', {
-                uri: selectedDocument,
-                name: fileName,
-                type: 'application/pdf',
+                uri: selectedDocument.uri,
+                name: selectedDocument.name,
+                type: selectedDocument.mimeType,
               } as any);
             }
+            console.log('data update', formDataUpdate);
             const updateBerkas = await axios.post(
-              `${config.API_URL}/berkas/update/${formData.id}`,
-              {
-                formDataUpdate,
-              },
+              `${config.API_URL}/api/berkas/update/${formData.id}`,
+              formDataUpdate,
               {
                 headers: {
                   'Content-Type': 'multipart/form-data',
@@ -204,7 +209,7 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
               if (SimpanToken) {
                 console.log('data lokasi berhasil disimpan');
                 Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
-                  { text: 'OK', onPress: onClose },
+                  { text: 'OK', onPress: onSuccess },
                 ]);
               }
             } else {
@@ -257,11 +262,6 @@ export function UpdateBerkas({ onClose, dataBerkas }: UpdateBerkasProps) {
           textStyle={styles.customTextStyle}
           errorTextStyle={styles.customErrorTextStyle}
         />
-        {selectedDocument && (
-          <Text style={styles.selectedDocumentText}>
-            Selected Document: {selectedDocument.name}
-          </Text>
-        )}
         <View style={{ flexDirection: 'row' }}>
           <GradientButton
             title="OK"

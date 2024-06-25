@@ -4,10 +4,10 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
   Image as ImageReact,
   Alert,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { StackProps } from '@navigator/stack';
 import { useFocusEffect } from '@react-navigation/native';
@@ -282,7 +282,7 @@ export default function Home({ navigation }: StackProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar />
       <View style={styles.header}>
         <Image source={images.logo_sm} style={styles.logo} />
         <Text style={styles.headerTitle}>SIMPEG SEHAT</Text>

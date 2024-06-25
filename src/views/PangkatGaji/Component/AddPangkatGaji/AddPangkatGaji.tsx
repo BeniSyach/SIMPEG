@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   form: {
-    // backgroundColor: '#fff',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 20,
     shadowColor: '#000',

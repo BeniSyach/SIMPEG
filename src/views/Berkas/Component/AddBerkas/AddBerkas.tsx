@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   form: {
-    // backgroundColor: '#fff',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 20,
     shadowColor: '#000',
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   customTextStyle: {
     color: 'blue',
-    fontSize: 18,
+    fontSize: 14,
   },
   customErrorTextStyle: {
     color: 'orange',
@@ -95,9 +95,10 @@ const styles = StyleSheet.create({
 
 type AddBerkasProps = {
   onClose: () => void;
+  onSuccess: () => void;
 };
 
-export function AddBerkas({ onClose }: AddBerkasProps) {
+export function AddBerkas({ onClose, onSuccess }: AddBerkasProps) {
   const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
@@ -118,10 +119,12 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
   const [errorFile, setErrorFile] = useState<string>('');
 
   const handleDateStartChange = (date: Date) => {
+    console.log('tgl mulai', formatDate(date));
     setSelectedDate(date);
   };
 
   const handleDateEndChange = (date: Date) => {
+    console.log('tgl akhir', date);
     setSelectedEndDate(date);
   };
 
@@ -150,24 +153,21 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
           if (token) {
             formDataPost.append('jenis_berkas', formData.jenis_berkas);
             formDataPost.append('nomor_berkas', formData.nomor_berkas);
-            formDataPost.append('tgl_mulai', selectedDate.toDateString());
-            formDataPost.append('tgl_akhir', selectedEndDate.toDateString());
+            formDataPost.append('tgl_mulai', formatDate(selectedDate));
+            formDataPost.append('tgl_akhir', formatDate(selectedEndDate));
             if (selectedDocument) {
               console.log('data foto', selectedDocument);
-              // Mendapatkan nama file dari URI
-              const fileName = selectedDocument.split('/').pop() || 'file.pdf';
 
               formDataPost.append('file', {
-                uri: selectedDocument,
-                name: fileName,
-                type: 'application/pdf',
+                uri: selectedDocument.uri,
+                name: selectedDocument.name,
+                type: selectedDocument.mimeType,
               } as any);
             }
+            console.log('data formdata', formDataPost);
             const addBerkas = await axios.post(
               `${config.API_URL}/api/berkas/create`,
-              {
-                formDataPost,
-              },
+              formDataPost,
               {
                 headers: {
                   'Content-Type': 'multipart/form-data',
@@ -181,7 +181,7 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
               if (SimpanToken) {
                 console.log('data lokasi berhasil disimpan');
                 Alert.alert('Simpan Data Sukes', `Data Berhasil Disimpan`, [
-                  { text: 'OK', onPress: onClose },
+                  { text: 'OK', onPress: onSuccess },
                 ]);
               }
             } else {
@@ -198,12 +198,12 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
     }
   };
 
-  // const formatDate = (date: Date) => {
-  //   const day = String(date.getDate()).padStart(2, '0');
-  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-  //   const year = date.getFullYear();
-  //   return `${day}/${month}/${year}`;
-  // };
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   const handleInputChange = (name: string, value: string) => {
     setFormData({
@@ -213,7 +213,8 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
   };
 
   const handleDocumentPicked = (document: any) => {
-    setSelectedDocument(document);
+    console.log('dokumen', document);
+    setSelectedDocument(document.assets[0]);
     setErrorFile(''); // Clear error when a document is selected
   };
 
@@ -248,11 +249,6 @@ export function AddBerkas({ onClose }: AddBerkasProps) {
           textStyle={styles.customTextStyle}
           errorTextStyle={styles.customErrorTextStyle}
         />
-        {selectedDocument && (
-          <Text style={styles.selectedDocumentText}>
-            Selected Document: {selectedDocument.name}
-          </Text>
-        )}
         <View style={{ flexDirection: 'row' }}>
           <GradientButton
             title="OK"

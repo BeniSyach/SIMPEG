@@ -74,7 +74,7 @@ export default function Berkas({ navigation, route }: StackProps) {
         if (berkas) {
           const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, berkas);
           if (SimpanToken) {
-            console.log('data Pangkat Gaji berhasil disimpan');
+            console.log('data Berkas berhasil disimpan');
             const newData = berkas.data.map((item: any) => ({
               id: item.id,
               nik: item.nik,
@@ -102,7 +102,7 @@ export default function Berkas({ navigation, route }: StackProps) {
         console.log('Token not found.');
       }
     } catch (err) {
-      console.log('[##] preload error Pangkat Gaji:', err);
+      console.log('[##] preload error Berkas:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -147,7 +147,7 @@ export default function Berkas({ navigation, route }: StackProps) {
       setData(data.filter(item => item.id !== id));
       Alert.alert('Sukses', `Berhasil Menghapus Data`);
     } catch (error) {
-      console.log('Delete Data error:', error);
+      console.log('Delete Data Berkas error:', error);
     }
   };
 
@@ -174,6 +174,16 @@ export default function Berkas({ navigation, route }: StackProps) {
     />
   );
 
+  const handleAddBerkasSuccess = () => {
+    setOpenAdd(false);
+    handleRefresh(); // Memanggil fungsi refresh untuk merender ulang data setelah menambahkan data baru
+  };
+
+  const handleUpdateBerkasSuccess = () => {
+    setOpenUpdate(false);
+    handleRefresh(); // Memanggil fungsi refresh untuk merender ulang data setelah mengupdate data
+  };
+
   return (
     <View style={styles.container}>
       <Button title="Tambah Data" onPress={handleAddItem} />
@@ -188,10 +198,14 @@ export default function Berkas({ navigation, route }: StackProps) {
         onRefresh={handleRefresh}
       />
       <BottomSheet isOpen={isOpenAdd}>
-        <AddBerkas onClose={() => setOpenAdd(false)} />
+        <AddBerkas onClose={() => setOpenAdd(false)} onSuccess={handleAddBerkasSuccess} />
       </BottomSheet>
       <BottomSheet isOpen={isOpenUpdate}>
-        <UpdateBerkas onClose={() => setOpenUpdate(false)} dataBerkas={dataUpdate} />
+        <UpdateBerkas
+          onClose={() => setOpenUpdate(false)}
+          onSuccess={handleUpdateBerkasSuccess}
+          dataBerkas={dataUpdate}
+        />
       </BottomSheet>
     </View>
   );

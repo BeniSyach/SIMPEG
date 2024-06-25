@@ -5,13 +5,18 @@ import Button from '@components/Button';
 import FormInput from '@components/FormInput';
 import config from '@utils/config';
 import { useDataPersist, DataPersistKeys } from '@hooks';
+import { LinearGradient } from 'expo-linear-gradient';
+import Image from '@components/Image';
+import { images } from '@theme';
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 16,
-    backgroundColor: '#f0f0f0',
   },
   title: {
     fontSize: 24,
@@ -19,6 +24,13 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 32,
+  },
+  posisi_logo: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
   form: {
     backgroundColor: '#fff',
@@ -32,6 +44,21 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 16,
+  },
+  button: {
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  Footertitle: {
+    marginVertical: 15,
+    fontSize: 14,
+    color: 'rgba(156, 163, 175, 0.8)',
+    textAlign: 'center',
+  },
+  subTitleFooter: {
+    fontSize: 14,
+    color: 'rgba(156, 163, 175, 0.8)',
+    textAlign: 'center',
   },
 });
 
@@ -103,28 +130,37 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <View style={styles.form}>
-        <FormInput
-          label="NIK/NIP"
-          value={nik}
-          onChangeText={setNik}
-          keyboardType="numeric"
-          error={nikError}
-        />
-        <FormInput
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          error={passwordError}
-        />
-        <View style={styles.buttonContainer}>
-          <Button title="Login" onPress={handleLogin} />
+    <LinearGradient
+      colors={['#a8e063', '#56ab2f']} // Warna gradien hijau
+      style={styles.gradient}>
+      <View style={styles.container}>
+        <View style={styles.form}>
+          <View style={styles.posisi_logo}>
+            <Image source={images.logo_sm} style={styles.logo} />
+          </View>
+          <FormInput
+            label="NIK/NIP"
+            value={nik}
+            onChangeText={setNik}
+            keyboardType="numeric"
+            error={nikError}
+          />
+          <FormInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            error={passwordError}
+          />
+          <View style={styles.buttonContainer}>
+            <Button title="Login" onPress={handleLogin} style={styles.button} />
+          </View>
+          <Text style={styles.Footertitle}>Version 1.0</Text>
+          <Text style={styles.subTitleFooter}>Sistem Informasi Management Pegawai</Text>
+          <Text style={styles.subTitleFooter}>Dinas Kesehatan Kabupaten Deli Serdang</Text>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
