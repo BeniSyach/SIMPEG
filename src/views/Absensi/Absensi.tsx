@@ -1,8 +1,23 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  ListRenderItem,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { StackProps } from '@navigator/stack';
 import RNPickerSelect from 'react-native-picker-select';
 import { useState } from 'react';
 import Button from '@components/Button';
+import { colors } from '@theme';
+import { DataPersistKeys, useDataPersist } from '@hooks';
+import { IUser } from '@modules/app';
+import CardAbsensi from '@components/CardAbsensi';
+import { useAbsensiService } from '@modules/Absensi/absensi.service';
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -33,7 +48,7 @@ const styles = StyleSheet.create({
     flexBasis: 100,
   },
   buttonCombo: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.black,
     height: 50,
     width: 100,
     borderRadius: 20,
@@ -75,6 +90,9 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
   },
+  loadingIndicator: {
+    paddingVertical: 20,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({
@@ -100,8 +118,86 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
+type Item = {
+  id: string;
+  bulan: string;
+  persen: string;
+};
+
 export default function Absensi({ navigation, route }: StackProps) {
-  const [selectedValue, setSelectedValue] = useState('');
+  const { getPersistData, setPersistData } = useDataPersist();
+  const { getAbsensi } = useAbsensiService();
+  const currentYear = new Date().getFullYear();
+  const [selectedValue, setSelectedValue] = useState<string>(`${currentYear}`);
+  const [data, setData] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+
+  const generateYearOptions = (startYear: number, range: number) => {
+    const years = [];
+    for (let i = startYear - range; i <= startYear + range; i++) {
+      years.push({ label: `${i}`, value: `${i}` });
+    }
+    return years;
+  };
+
+  const yearOptions = generateYearOptions(currentYear, 5);
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return <ActivityIndicator style={styles.loadingIndicator} />;
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setPage(1);
+    // setData([]);
+    fetchData();
+  };
+
+  const fetchData = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+      if (token) {
+        console.log('User Token found:', token);
+        const berkas = await getAbsensi(token.access_token);
+        if (berkas) {
+          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, berkas);
+          if (SimpanToken) {
+            console.log('data Berkas berhasil disimpan');
+            const newData = berkas.data.map((item: any) => ({
+              id: item.id,
+              bulan: item.bulan,
+              persen: item.persen,
+            }));
+            setData(newData);
+          }
+        } else {
+          const newData: Item[] = Array.from({ length: 1 }, (_, i) => ({
+            id: 'tidak ada',
+            bulan: 'tidak ada',
+            persen: 'tidak ada',
+          }));
+          setData(prevData => [...prevData, ...newData]);
+        }
+      } else {
+        console.log('Token not found.');
+      }
+    } catch (err) {
+      console.log('[##] preload error Berkas:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const renderItem: ListRenderItem<Item> = ({ item }) => (
+    <CardAbsensi id={item.id} title={item.bulan} description={item.persen} />
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -113,12 +209,9 @@ export default function Absensi({ navigation, route }: StackProps) {
             <View style={styles.pickerContainer}>
               <RNPickerSelect
                 onValueChange={value => setSelectedValue(value)}
-                items={[
-                  { label: '2024', value: '2024' },
-                  { label: '2023', value: '2023' },
-                  { label: '2022', value: '2022' },
-                ]}
+                items={yearOptions}
                 style={pickerSelectStyles}
+                value={selectedValue}
               />
             </View>
             <View style={styles.filterButton}>
@@ -132,39 +225,17 @@ export default function Absensi({ navigation, route }: StackProps) {
               />
             </View>
           </View>
-          {/* Cards */}
-          <View style={styles.row}>
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('DetailAbsensiStack', { from: selectedValue })}>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardText}>Bulan</Text>
-                <Text style={styles.cardSubText}>Persen</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('DetailAbsensiStack', { from: selectedValue })}>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardText}>bulan</Text>
-                <Text style={styles.cardSubText}>Persen</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.card}>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardText}>Bulan</Text>
-                <Text style={styles.cardSubText}>Persen</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.card}>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardText}>bulan</Text>
-                <Text style={styles.cardSubText}>Persen</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          {/* Cards dengan infinite scroll */}
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            // onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
         </View>
         <View
           style={{
