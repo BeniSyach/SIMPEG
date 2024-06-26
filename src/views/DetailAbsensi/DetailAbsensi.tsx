@@ -3,7 +3,6 @@ import FormInput from '@components/FormInput';
 import { StackProps } from '@navigator';
 import { colors } from '@theme';
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
   root: {
@@ -81,10 +80,15 @@ const styles = StyleSheet.create({
 });
 
 export default function DetailAbsensi({ navigation, route }: StackProps) {
-  if (!route.params?.from) {
-    return <Text style={styles.title}>Error: Missing 'from' parameter</Text>;
+  const { bulan, tahun } = route.params as { bulan: string; tahun: string };
+  if (!bulan) {
+    return <Text style={styles.title}>Error: Missing 'bulan' parameter</Text>;
   }
-  const { from } = route.params;
+
+  if (!tahun) {
+    return <Text style={styles.title}>Error: Missing 'tahun' parameter</Text>;
+  }
+
   return (
     <SafeAreaView style={styles.root}>
       <StatusBar barStyle="light-content" />
@@ -92,8 +96,8 @@ export default function DetailAbsensi({ navigation, route }: StackProps) {
         <Text style={styles.title}>Detail Absensi</Text>
       </View>
       <View style={styles.form}>
-        <FormInput label="Kehadiran" value={from} readOnly />
-        <FormInput label="Absen" readOnly />
+        <FormInput label="Kehadiran" value={tahun} readOnly />
+        <FormInput label="Absen" value={bulan} readOnly />
         <FormInput label="Izin / SPT" readOnly />
         <FormInput label="Telat" readOnly />
         <View style={styles.buttonContainer}>

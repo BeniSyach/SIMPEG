@@ -13,7 +13,7 @@ export type StackParamList = {
   BerkasStack: { from: string };
   UserStack: { from: string };
   AbsensiStack: { from: string };
-  DetailAbsensiStack: { from: string };
+  DetailAbsensiStack: { bulan: string; tahun: string };
   // add more screen props...
 };
 

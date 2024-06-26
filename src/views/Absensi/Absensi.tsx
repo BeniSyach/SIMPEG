@@ -115,7 +115,7 @@ const pickerSelectStyles = StyleSheet.create({
 });
 
 type Item = {
-  bulan: string;
+  bulan: number;
   persen: string;
 };
 
@@ -181,13 +181,13 @@ export default function Absensi({ navigation, route }: StackProps) {
         if (getAbsen) {
           console.log('data Absen Berhasil di ambil', getAbsen);
           const newData = getAbsen.allAbsenMasuk.map((item: any) => ({
-            bulan: getMonthName(item.bulan_masuk),
+            bulan: item.bulan_masuk,
             persen: item.jumlah_absen,
           }));
           setData(newData);
         } else {
           const newData: Item[] = Array.from({ length: 1 }, (_, i) => ({
-            bulan: 'tidak ada',
+            bulan: 0,
             persen: 'tidak ada',
           }));
           setData(prevData => [...prevData, ...newData]);
@@ -224,9 +224,14 @@ export default function Absensi({ navigation, route }: StackProps) {
 
   const renderItem: ListRenderItem<Item> = ({ item }) => (
     <CardAbsensi
-      title={item.bulan}
+      title={getMonthName(item.bulan)}
       description={item.persen}
-      onPress={() => navigation.navigate('DetailAbsensiStack', { from: selectedValue })}
+      onPress={() =>
+        navigation.navigate('DetailAbsensiStack', {
+          bulan: item.bulan.toString(),
+          tahun: selectedValue,
+        })
+      }
     />
   );
 
@@ -260,7 +265,7 @@ export default function Absensi({ navigation, route }: StackProps) {
         <FlatList
           data={data}
           renderItem={renderItem}
-          keyExtractor={item => item.bulan}
+          keyExtractor={item => item.persen}
           // onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
