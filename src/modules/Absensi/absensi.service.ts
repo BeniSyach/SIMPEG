@@ -1,17 +1,17 @@
 import { IUAbsensi } from './absensi.typeDefs';
 import axios from 'axios';
-import config from '@utils/config';
-
 export function useAbsensiService() {
-  async function getAbsensi(token: string): Promise<IUAbsensi | null> {
+  async function getAbsensi(nik: number, tahun: string): Promise<IUAbsensi | null> {
     try {
       const response = await axios.post(
-        `${config.API_URL}/api/berkas`,
-        {},
+        `http://103.114.111.178:3035/api/laporan/get-data-absen-pertahun`,
+        {
+          nik,
+          tahun,
+        },
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
         },
       );

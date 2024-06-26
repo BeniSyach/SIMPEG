@@ -1,12 +1,11 @@
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   ListRenderItem,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { StackProps } from '@navigator/stack';
@@ -14,17 +13,14 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useState } from 'react';
 import Button from '@components/Button';
 import { colors } from '@theme';
-import { DataPersistKeys, useDataPersist } from '@hooks';
-import { IUser } from '@modules/app';
+import { useDataPersist } from '@hooks';
+import { useAppSlice } from '@modules/app';
 import CardAbsensi from '@components/CardAbsensi';
 import { useAbsensiService } from '@modules/Absensi/absensi.service';
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-  },
-  scrollView: {
-    flexGrow: 1,
   },
   container: {
     flex: 1,
@@ -119,14 +115,15 @@ const pickerSelectStyles = StyleSheet.create({
 });
 
 type Item = {
-  id: string;
   bulan: string;
   persen: string;
 };
 
 export default function Absensi({ navigation, route }: StackProps) {
-  const { getPersistData, setPersistData } = useDataPersist();
+  const { removeAllPersistData } = useDataPersist();
+  const { dispatch, reset } = useAppSlice();
   const { getAbsensi } = useAbsensiService();
+  const { user } = useAppSlice();
   const currentYear = new Date().getFullYear();
   const [selectedValue, setSelectedValue] = useState<string>(`${currentYear}`);
   const [data, setData] = useState<Item[]>([]);
@@ -141,6 +138,24 @@ export default function Absensi({ navigation, route }: StackProps) {
     }
     return years;
   };
+
+  function getMonthName(month: number): string {
+    const monthNames = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return monthNames[month - 1] || '';
+  }
 
   const yearOptions = generateYearOptions(currentYear, 5);
 
@@ -159,102 +174,117 @@ export default function Absensi({ navigation, route }: StackProps) {
   const fetchData = async () => {
     if (loading) return;
     setLoading(true);
-
-    try {
-      const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
-      if (token) {
-        console.log('User Token found:', token);
-        const berkas = await getAbsensi(token.access_token);
-        if (berkas) {
-          const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, berkas);
-          if (SimpanToken) {
-            console.log('data Berkas berhasil disimpan');
-            const newData = berkas.data.map((item: any) => ({
-              id: item.id,
-              bulan: item.bulan,
-              persen: item.persen,
-            }));
-            setData(newData);
-          }
+    const nikUser = user?.data.nik;
+    if (nikUser !== undefined) {
+      try {
+        const getAbsen = await getAbsensi(nikUser, selectedValue);
+        if (getAbsen) {
+          console.log('data Absen Berhasil di ambil', getAbsen);
+          const newData = getAbsen.allAbsenMasuk.map((item: any) => ({
+            bulan: getMonthName(item.bulan_masuk),
+            persen: item.jumlah_absen,
+          }));
+          setData(newData);
         } else {
           const newData: Item[] = Array.from({ length: 1 }, (_, i) => ({
-            id: 'tidak ada',
             bulan: 'tidak ada',
             persen: 'tidak ada',
           }));
           setData(prevData => [...prevData, ...newData]);
         }
-      } else {
-        console.log('Token not found.');
+      } catch (err) {
+        console.log('[##] preload error Absensi:', err);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      console.log('[##] preload error Berkas:', err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+    } else {
+      Alert.alert('Gagal Mengambil Data', `Silahkan Login Kembali`, [
+        { text: 'OK', onPress: handleLogout },
+      ]);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Hapus data pengguna dari penyimpanan persisten
+      const hapusDataLogin = await removeAllPersistData();
+      if (hapusDataLogin) {
+        console.log('Berhasil menghapus data pengguna.');
+        // Reset status login dan hapus data pengguna dari store Redux
+        dispatch(reset());
+        Alert.alert('Logout Berhasil', `Berhasil Keluar akun`);
+      } else {
+        console.error('Gagal megnhapus data pengguna.');
+      }
+    } catch (error) {
+      console.log('Logout error:', error);
     }
   };
 
   const renderItem: ListRenderItem<Item> = ({ item }) => (
-    <CardAbsensi id={item.id} title={item.bulan} description={item.persen} />
+    <CardAbsensi
+      title={item.bulan}
+      description={item.persen}
+      onPress={() => navigation.navigate('DetailAbsensiStack', { from: selectedValue })}
+    />
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <View style={styles.container}>
-          {/* Combo box and Filter button */}
-          <Text style={styles.titleCombo}>Pilih Tahun :</Text>
-          <View style={styles.filterContainer}>
-            <View style={styles.pickerContainer}>
-              <RNPickerSelect
-                onValueChange={value => setSelectedValue(value)}
-                items={yearOptions}
-                style={pickerSelectStyles}
-                value={selectedValue}
-              />
-            </View>
-            <View style={styles.filterButton}>
-              <Button
-                title="Filter"
-                style={styles.buttonCombo}
-                onPress={() => {
-                  // Implement filter logic here
-                  console.log(`Selected value: ${selectedValue}`);
-                }}
-              />
-            </View>
+      <View style={styles.container}>
+        {/* Combo box and Filter button */}
+        <Text style={styles.titleCombo}>Pilih Tahun :</Text>
+        <View style={styles.filterContainer}>
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={value => setSelectedValue(value)}
+              items={yearOptions}
+              style={pickerSelectStyles}
+              value={selectedValue}
+            />
           </View>
-          {/* Cards dengan infinite scroll */}
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            // onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={renderFooter}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-          />
+          <View style={styles.filterButton}>
+            <Button
+              title="Filter"
+              style={styles.buttonCombo}
+              onPress={() => {
+                // Implement filter logic here
+                handleRefresh();
+                console.log(`Selected value: ${selectedValue}`);
+              }}
+            />
+          </View>
         </View>
-        <View
+        {/* Cards dengan infinite scroll */}
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item.bulan}
+          // onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+        />
+      </View>
+      <View
+        style={{
+          position: 'absolute', // Mengatur posisi absolut
+          bottom: 0, // Menempatkan teks di bagian bawah layar
+          left: 0,
+          right: 0,
+          marginBottom: 20, // Jarak dari bawah layar
+          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
+        }}>
+        <Text
           style={{
-            position: 'absolute', // Mengatur posisi absolut
-            bottom: 0, // Menempatkan teks di bagian bawah layar
-            left: 0,
-            right: 0,
-            marginBottom: 20, // Jarak dari bawah layar
-            alignItems: 'center', // Menempatkan teks di tengah secara horizontal
+            fontSize: 12,
+            color: '#000000',
           }}>
-          <Text
-            style={{
-              fontSize: 12,
-              color: '#000000',
-            }}>
-            © IT RSUD HAT
-          </Text>
-        </View>
-      </ScrollView>
+          © IT RSUD HAT
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }

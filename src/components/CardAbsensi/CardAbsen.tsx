@@ -1,24 +1,27 @@
 import { colors } from '@theme';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 type CardProps = {
-  id: string;
   title: string;
   description: string;
+  onPress: (title: string) => void;
 };
 
-const CardAbsen: React.FC<CardProps> = ({ id, title, description }) => {
+const CardAbsen: React.FC<CardProps> = ({ title, description, onPress }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={() => onPress(title)} style={styles.card}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     backgroundColor: '#fff',
     borderRadius: 30,
     padding: 20,
@@ -35,9 +38,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   description: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#666',
-    marginTop: 8,
   },
   buttonContainer: {
     flexDirection: 'row',

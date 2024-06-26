@@ -1,14 +1,8 @@
 export interface IUAbsensi {
-  access_token: string;
-  data: [
+  allAbsenMasuk: [
     {
-      id: string;
-      nik: number;
-      jenis_berkas: string;
-      nomor_berkas: string;
-      tgl_mulai: string;
-      tgl_akhir: string;
-      file: string;
+      bulan_masuk: string;
+      jumlah_absen: string;
     },
   ];
   // Tambahkan properti lain yang relevan
