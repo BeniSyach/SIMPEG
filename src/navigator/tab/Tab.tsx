@@ -23,10 +23,10 @@ export default function TabNavigator() {
       screenOptions={({ route }) => ({
         tabBarIcon: renderTabBarIcon(route.name),
         headerShown: false,
-        tabBarInactiveTintColor: colors.gray,
-        tabBarInactiveBackgroundColor: '#39378A',
-        tabBarActiveTintColor: colors.white,
-        tabBarActiveBackgroundColor: '#39378A',
+        tabBarInactiveTintColor: colors.white,
+        tabBarInactiveBackgroundColor: '#56ab2f',
+        tabBarActiveTintColor: colors.black,
+        tabBarActiveBackgroundColor: '#56ab2f',
       })}>
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Home' }} />
       <Tab.Screen

@@ -78,9 +78,10 @@ const styles = StyleSheet.create({
 
 type AddPangkatGajiProps = {
   onClose: () => void;
+  onSuccess: () => void;
 };
 
-export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
+export function AddPangkatGaji({ onClose, onSuccess }: AddPangkatGajiProps) {
   const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
@@ -131,6 +132,13 @@ export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const handleSubmit = async () => {
@@ -193,12 +201,12 @@ export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
               {
                 ditetapkan: formData.ditetapkan,
                 nomor_sk: formData.nomor_sk,
-                tgl_sk: TanggalSkDate,
-                tmt_pangkat: TmtPangkatDate,
+                tgl_sk: formatDate(TanggalSkDate),
+                tmt_pangkat: formatDate(TmtPangkatDate),
                 golongan_ruang: formData.golongan_ruang,
                 masa_kerja_tahun: formData.masa_kerja_tahun,
                 masa_kerja_bulan: formData.masa_kerja_bulan,
-                tmt_gaji_berkala: TmtGajiBerkalaDate,
+                tmt_gaji_berkala: formatDate(TmtGajiBerkalaDate),
                 masa_kerja_gaji_tahun: formData.masa_kerja_gaji_tahun,
                 masa_kerja_gaji_bulan: formData.masa_kerja_gaji_bulan,
                 gaji_pokok: formData.gaji_pokok,
@@ -215,9 +223,19 @@ export function AddPangkatGaji({ onClose }: AddPangkatGajiProps) {
               if (SimpanToken) {
                 console.log('data Pangkat Gaji berhasil disimpan');
                 Alert.alert('Tambah Data Sukes', `Data Berhasil Disimpan`, [
+                  { text: 'OK', onPress: onSuccess },
+                ]);
+              } else {
+                console.log('token gagal disimpan');
+                Alert.alert('Tambah Data Gagal', `Data Gagal Disimpan`, [
                   { text: 'OK', onPress: onClose },
                 ]);
               }
+            } else {
+              console.log('gagal mengubah data');
+              Alert.alert('Tambah Data Gagal', `Data Gagal Disimpan`, [
+                { text: 'OK', onPress: onClose },
+              ]);
             }
           }
         } catch (error) {

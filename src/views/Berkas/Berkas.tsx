@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  ListRenderItem,
-  Button,
-  Alert,
-} from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, ListRenderItem, Alert } from 'react-native';
 import { StackProps } from '@navigator/stack';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import Card from '@components/Card';
@@ -16,6 +8,7 @@ import { IUser } from '@modules/app';
 import BottomSheet from '@components/BottomSheet';
 import { AddBerkas } from './Component/AddBerkas';
 import { UpdateBerkas } from './Component/UpdateBerkas';
+import Button from '@components/Button';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,6 +17,14 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     paddingVertical: 20,
+  },
+  button: {
+    marginVertical: 10,
+    width: 150,
+  },
+  PosisiButtonTambah: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
@@ -176,17 +177,19 @@ export default function Berkas({ navigation, route }: StackProps) {
 
   const handleAddBerkasSuccess = () => {
     setOpenAdd(false);
-    handleRefresh(); // Memanggil fungsi refresh untuk merender ulang data setelah menambahkan data baru
+    handleRefresh();
   };
 
   const handleUpdateBerkasSuccess = () => {
     setOpenUpdate(false);
-    handleRefresh(); // Memanggil fungsi refresh untuk merender ulang data setelah mengupdate data
+    handleRefresh();
   };
 
   return (
     <View style={styles.container}>
-      <Button title="Tambah Data" onPress={handleAddItem} />
+      <View style={styles.PosisiButtonTambah}>
+        <Button style={styles.button} title="Tambah Data" onPress={handleAddItem} />
+      </View>
       <FlatList
         data={data}
         renderItem={renderItem}

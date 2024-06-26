@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2FF',
   },
   header: {
-    backgroundColor: '#2A287A',
+    backgroundColor: '#a8e063',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
     marginLeft: 20,
   },
   welcome: {
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     paddingHorizontal: 10,
-    backgroundColor: '#39378A',
+    backgroundColor: '#56ab2f',
   },
   foto_profile: {
     borderRadius: 50,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 100,
     borderRadius: 50, // Membuat lingkaran
-    backgroundColor: '#39378A',
+    backgroundColor: '#56ab2f',
     justifyContent: 'center',
     marginBottom: 5,
   },

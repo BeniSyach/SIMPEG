@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
 
 type UpdatePangkatGajiProps = {
   onClose: () => void;
+  onSuccess: () => void;
   DataPangkatGaji: {
     id: string;
     nik: number;
@@ -97,7 +98,7 @@ type UpdatePangkatGajiProps = {
   };
 };
 
-export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGajiProps) {
+export function UpdatePangkatGaji({ onClose, onSuccess, DataPangkatGaji }: UpdatePangkatGajiProps) {
   const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
@@ -236,9 +237,19 @@ export function UpdatePangkatGaji({ onClose, DataPangkatGaji }: UpdatePangkatGaj
               if (SimpanToken) {
                 console.log('data Pangkat Gaji berhasil Diubah');
                 Alert.alert('Update Data Sukes', `Data Berhasil Diubah`, [
+                  { text: 'OK', onPress: onSuccess },
+                ]);
+              } else {
+                console.log('token gagal disimpan');
+                Alert.alert('Update Data Gagal', `Data Gagal Diubah`, [
                   { text: 'OK', onPress: onClose },
                 ]);
               }
+            } else {
+              console.log('gagal mengubah data');
+              Alert.alert('Update Data Gagal', `Data Gagal Diubah`, [
+                { text: 'OK', onPress: onClose },
+              ]);
             }
           }
         } catch (error) {

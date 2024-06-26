@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 100,
     borderRadius: 50, // Membuat lingkaran
-    backgroundColor: '#39378A',
+    backgroundColor: '#56ab2f',
     justifyContent: 'center',
     marginBottom: 5,
   },

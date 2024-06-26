@@ -130,9 +130,7 @@ const Login = () => {
   };
 
   return (
-    <LinearGradient
-      colors={['#a8e063', '#56ab2f']} // Warna gradien hijau
-      style={styles.gradient}>
+    <LinearGradient colors={['#a8e063', '#56ab2f']} style={styles.gradient}>
       <View style={styles.container}>
         <View style={styles.form}>
           <View style={styles.posisi_logo}>

@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  ListRenderItem,
-  Button,
-  Alert,
-} from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, ListRenderItem, Alert } from 'react-native';
 import { StackProps } from '@navigator/stack';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import Card from '@components/Card';
@@ -16,6 +8,7 @@ import { IUser } from '@modules/app';
 import BottomSheet from '@components/BottomSheet';
 import { AddPangkatGaji } from './Component/AddPangkatGaji';
 import { UpdatePangkatGaji } from './Component/UpdatePangkatGaji';
+import Button from '@components/Button';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,6 +17,14 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     paddingVertical: 20,
+  },
+  button: {
+    marginVertical: 10,
+    width: 150,
+  },
+  PosisiButtonTambah: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
@@ -196,9 +197,21 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
     />
   );
 
+  const handleAddBerkasSuccess = () => {
+    setOpenAdd(false);
+    handleRefresh();
+  };
+
+  const handleUpdateBerkasSuccess = () => {
+    setOpenUpdate(false);
+    handleRefresh();
+  };
+
   return (
     <View style={styles.container}>
-      <Button title="Tambah Data" onPress={handleAddItem} />
+      <View style={styles.PosisiButtonTambah}>
+        <Button style={styles.button} title="Tambah Data" onPress={handleAddItem} />
+      </View>
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -210,10 +223,14 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
         onRefresh={handleRefresh}
       />
       <BottomSheet isOpen={isOpenAdd}>
-        <AddPangkatGaji onClose={() => setOpenAdd(false)} />
+        <AddPangkatGaji onClose={() => setOpenAdd(false)} onSuccess={handleAddBerkasSuccess} />
       </BottomSheet>
       <BottomSheet isOpen={isOpenUpdate}>
-        <UpdatePangkatGaji onClose={() => setOpenUpdate(false)} DataPangkatGaji={dataUpdate} />
+        <UpdatePangkatGaji
+          onClose={() => setOpenUpdate(false)}
+          onSuccess={handleUpdateBerkasSuccess}
+          DataPangkatGaji={dataUpdate}
+        />
       </BottomSheet>
     </View>
   );
