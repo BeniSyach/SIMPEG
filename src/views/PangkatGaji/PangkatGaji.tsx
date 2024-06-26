@@ -9,6 +9,8 @@ import BottomSheet from '@components/BottomSheet';
 import { AddPangkatGaji } from './Component/AddPangkatGaji';
 import { UpdatePangkatGaji } from './Component/UpdatePangkatGaji';
 import Button from '@components/Button';
+import axios from 'axios';
+import config from '@utils/config';
 
 const styles = StyleSheet.create({
   container: {
@@ -168,7 +170,33 @@ export default function PangkatGaji({ navigation, route }: StackProps) {
   const HandleDeleteData = async (id: string) => {
     try {
       setData(data.filter(item => item.id !== id));
-      Alert.alert('Sukses', `Berhasil Menghapus Data`);
+      try {
+        const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
+        if (token) {
+          const deleteBerkas = await axios.post(
+            `${config.API_URL}/api/pangkat-gaji/delete/${id}`,
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token.access_token}`,
+              },
+            },
+          );
+          const success = deleteBerkas.data;
+          if (success.status === 'success') {
+            const SimpanToken = await setPersistData(DataPersistKeys.TOKEN, success);
+            if (SimpanToken) {
+              console.log('data berhasil dihapus');
+              Alert.alert('Hapus Data Sukes', `Data Berhasil Dihapus`, [{ text: 'OK' }]);
+            }
+          } else {
+            Alert.alert('Gagal !!!', `Data Gagal Dihapus`, [{ text: 'OK' }]);
+          }
+        }
+      } catch (err) {
+        console.log('Delete Data Berkas error:', err);
+      }
     } catch (error) {
       console.log('Delete Data error:', error);
     }

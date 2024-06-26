@@ -1,18 +1,10 @@
 // ImageUpload.tsx
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  Button,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, Image, StyleProp, ViewStyle, TextStyle, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { colors } from '@theme';
+import Button from '@components/Button';
 
 const MAX_IMAGE_SIZE_MB = 1;
 
@@ -35,6 +27,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 8,
+  },
+  posisiGambar: {
+    marginTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   errorText: {
     fontSize: 12,
@@ -101,8 +98,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     <View style={[styles.container, style]}>
       {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
       <Button title="Ambil Foto" onPress={pickImage} />
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-      {error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
+      <View style={styles.posisiGambar}>
+        {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+        {error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
+      </View>
     </View>
   );
 };
