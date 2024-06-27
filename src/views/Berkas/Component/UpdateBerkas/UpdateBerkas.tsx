@@ -107,6 +107,7 @@ type UpdateBerkasProps = {
 };
 
 export function UpdateBerkas({ onClose, onSuccess, dataBerkas }: UpdateBerkasProps) {
+  const MAX_FILE_SIZE = 1048576;
   const { getPersistData, setPersistData } = useDataPersist();
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
@@ -124,7 +125,7 @@ export function UpdateBerkas({ onClose, onSuccess, dataBerkas }: UpdateBerkasPro
   const [NomorBerkasError, setNomorBerkasError] = useState('');
   const [selectedStartDateError, setselectedStartDateError] = useState('');
   const [selectedEndDateError, setselectedEndDateError] = useState('');
-  const [FileError, setFileError] = useState('');
+  const [FileError, setFileError] = useState('Ukuran Berkas Harus Dibawah 1 mb');
 
   useEffect(() => {
     setFormData(dataBerkas);
@@ -146,7 +147,11 @@ export function UpdateBerkas({ onClose, onSuccess, dataBerkas }: UpdateBerkasPro
   };
 
   const handleDocumentPicked = (document: any) => {
-    setSelectedDocument(document.assets[0]);
+    if (document.assets[0].size > MAX_FILE_SIZE) {
+      Alert.alert('Gagal mengambil File', `Berkas Harus Dibawah 1 mb`, [{ text: 'OK' }]);
+    } else {
+      setSelectedDocument(document.assets[0]);
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -172,6 +177,9 @@ export function UpdateBerkas({ onClose, onSuccess, dataBerkas }: UpdateBerkasPro
       valid = false;
     } else if (!formData.file) {
       setFileError('File Harus Dipilih');
+      valid = false;
+    } else if (selectedDocument.size > MAX_FILE_SIZE) {
+      setFileError('Ukuran Berkas Harus Dibawah 1 mb');
       valid = false;
     } else {
       if (valid) {

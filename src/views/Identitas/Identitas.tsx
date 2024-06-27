@@ -165,11 +165,8 @@ export default function Identitas({ navigation, route }: StackProps) {
     if (!Identitas) {
       setIdentitasError('Nama Identitas Tidak Boleh Kosong');
       valid = false;
-    } else if (!GelarDepan) {
-      setGelarDepanError('Gelar Depan Tidak Boleh Kosong');
-      valid = false;
-    } else if (!GelarBelakang) {
-      setGelarBelakangError('Gelar Belakang Tidak Boleh Kosong');
+    } else if (!GelarDepan && !GelarBelakang) {
+      setGelarDepanError('Gelar Depan Atau Gelar belakang Tidak Boleh Kosong');
       valid = false;
     } else if (!TempatLahir) {
       setTempatLahirError('Tempat Lahir Tidak Boleh Kosong');
@@ -242,7 +239,7 @@ export default function Identitas({ navigation, route }: StackProps) {
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView>
-        <StatusBar barStyle="light-content" />
+        <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <Text style={styles.title}>Edit Identitas</Text>
         </View>

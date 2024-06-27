@@ -118,7 +118,7 @@ export default function Profile({ navigation }: StackProps) {
 
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
       <View style={styles.menu}>
         <Text style={styles.menuTitle}>Profile</Text>
         <View style={styles.menuItems}>

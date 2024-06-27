@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, StyleSheet, Alert, Text, StatusBar } from 'react-native';
 import { useAppService, useAppSlice } from '@modules/app';
 import Button from '@components/Button';
 import FormInput from '@components/FormInput';
@@ -131,6 +131,7 @@ const Login = () => {
 
   return (
     <LinearGradient colors={['#a8e063', '#56ab2f']} style={styles.gradient}>
+      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
       <View style={styles.container}>
         <View style={styles.form}>
           <View style={styles.posisi_logo}>

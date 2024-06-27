@@ -238,8 +238,22 @@ export function AddPangkatGaji({ onClose, onSuccess }: AddPangkatGajiProps) {
               ]);
             }
           }
-        } catch (error) {
-          console.log('## post Gaji Pangkat', error);
+        } catch (err) {
+          if (axios.isAxiosError(err) && err.response?.status === 400) {
+            const responseBlob = err.response?.data;
+            console.log('## post Gaji Pangkat', err);
+            console.log('data error', responseBlob);
+            if (responseBlob?.access_token) {
+              const newToken = { access_token: responseBlob.access_token };
+              const simpanToken = await setPersistData(DataPersistKeys.TOKEN, newToken);
+              if (simpanToken) {
+                console.log('Token baru dari respons 404 berhasil disimpan', newToken);
+                Alert.alert('Edit Data Gagal', `Data Gagal Disimpan`, [
+                  { text: 'OK', onPress: onClose },
+                ]);
+              }
+            }
+          }
         }
       }
     }

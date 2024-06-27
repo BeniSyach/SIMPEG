@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -10,7 +10,6 @@ import {
   StatusBar,
 } from 'react-native';
 import { StackProps } from '@navigator/stack';
-import { useFocusEffect } from '@react-navigation/native';
 import { images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser, useAppSlice } from '@modules/app';
@@ -284,11 +283,9 @@ export default function Home({ navigation }: StackProps) {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      preloadHome();
-    }, []),
-  );
+  useEffect(() => {
+    preloadHome();
+  }, []);
 
   if (!isReady) {
     return null; // or a loading indicator
@@ -296,7 +293,7 @@ export default function Home({ navigation }: StackProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar />
+      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
       <View style={styles.header}>
         <Image source={images.logo_sm} style={styles.logo} />
         <Text style={styles.headerTitle}>SIMPEG SEHAT</Text>

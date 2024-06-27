@@ -99,6 +99,7 @@ type AddBerkasProps = {
 };
 
 export function AddBerkas({ onClose, onSuccess }: AddBerkasProps) {
+  const MAX_FILE_SIZE = 1048576;
   const { getPersistData, setPersistData } = useDataPersist();
   const [formData, setFormData] = useState({
     id: '',
@@ -116,7 +117,7 @@ export function AddBerkas({ onClose, onSuccess }: AddBerkasProps) {
   const [errorNomorBerkas, setErrorNomorBerkas] = useState<string>('');
   const [errorTglMulai, setErrorTglMulai] = useState<string>('');
   const [errorTglAkhir, setErrorTglAkhir] = useState<string>('');
-  const [errorFile, setErrorFile] = useState<string>('');
+  const [errorFile, setErrorFile] = useState<string>('Ukuran Berkas Harus Dibawah 1 mb');
 
   const handleDateStartChange = (date: Date) => {
     console.log('tgl mulai', formatDate(date));
@@ -144,6 +145,9 @@ export function AddBerkas({ onClose, onSuccess }: AddBerkasProps) {
       valid = false;
     } else if (!selectedDocument) {
       setErrorFile('Dokumen harus diisi');
+      valid = false;
+    } else if (selectedDocument.size > MAX_FILE_SIZE) {
+      setErrorFile('Ukuran Berkas Harus Dibawah 1 mb');
       valid = false;
     } else {
       if (valid) {
@@ -214,8 +218,12 @@ export function AddBerkas({ onClose, onSuccess }: AddBerkasProps) {
 
   const handleDocumentPicked = (document: any) => {
     console.log('dokumen', document);
-    setSelectedDocument(document.assets[0]);
-    setErrorFile(''); // Clear error when a document is selected
+    if (document.assets[0].size > MAX_FILE_SIZE) {
+      Alert.alert('Gagal mengambil File', `Berkas Harus Dibawah 1 mb`, [{ text: 'OK' }]);
+    } else {
+      setSelectedDocument(document.assets[0]);
+      setErrorFile('');
+    }
   };
 
   return (
