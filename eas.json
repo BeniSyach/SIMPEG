@@ -7,18 +7,18 @@
       "android": {
         "credentialsSource": "local"
       },
-      channel: "amazon-production"
+      "channel": "amazon-production"
     },
     "google-production": {
       "android": {
         "credentialsSource": "remote"
       },
-      channel: "google-production"
+      "channel": "google-production"
     },
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      channel: "development"
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -28,10 +28,10 @@
       "android": {
         "buildType": "apk"
       },
-      channel: "preview",
+      "channel": "preview"
     },
     "production": {
-      channel: "production"
+      "channel": "production"
     }
   },
   "submit": {
