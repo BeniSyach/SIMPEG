@@ -199,7 +199,7 @@ export default function Cpns({ navigation, route }: StackProps) {
   }
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
       <View style={{ alignItems: 'center', marginTop: 20 }}>
         <Text style={styles.title}>Edit Cpns</Text>
       </View>

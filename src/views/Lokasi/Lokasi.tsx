@@ -229,7 +229,7 @@ export default function Lokasi({ navigation, route }: StackProps) {
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView>
-        <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+        <StatusBar barStyle="light-content" backgroundColor={colors.black} />
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <Text style={styles.title}>Edit Lokasi</Text>
         </View>

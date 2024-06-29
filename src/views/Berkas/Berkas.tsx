@@ -4,7 +4,7 @@ import { StackProps } from '@navigator/stack';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import Card from '@components/Card';
 import { useBerkasService } from '@modules/Berkas';
-import { IUser } from '@modules/app';
+import { IUser, useAppSlice } from '@modules/app';
 import BottomSheet from '@components/BottomSheet';
 import { AddBerkas } from './Component/AddBerkas';
 import { UpdateBerkas } from './Component/UpdateBerkas';
@@ -41,7 +41,8 @@ type Item = {
 };
 
 export default function Berkas({ navigation, route }: StackProps) {
-  const { getPersistData, setPersistData } = useDataPersist();
+  const { getPersistData, setPersistData, removeAllPersistData } = useDataPersist();
+  const { dispatch, reset } = useAppSlice();
   const { getBerkas } = useBerkasService();
   const [data, setData] = useState<Item[]>([]);
   const [dataUpdate, setDataUpdate] = useState({
@@ -106,9 +107,29 @@ export default function Berkas({ navigation, route }: StackProps) {
       }
     } catch (err) {
       console.log('[##] preload error Berkas:', err);
+      Alert.alert('Error Internet 2', 'Silahkan login kembali', [
+        { text: 'OK', onPress: handleLogout },
+      ]);
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Hapus data pengguna dari penyimpanan persisten
+      const hapusDataLogin = await removeAllPersistData();
+      if (hapusDataLogin) {
+        console.log('Berhasil menghapus data pengguna.');
+        // Reset status login dan hapus data pengguna dari store Redux
+        dispatch(reset());
+        Alert.alert('Logout Berhasil', `Berhasil Keluar akun`);
+      } else {
+        console.error('Gagal megnhapus data pengguna.');
+      }
+    } catch (error) {
+      console.log('Logout error:', error);
     }
   };
 

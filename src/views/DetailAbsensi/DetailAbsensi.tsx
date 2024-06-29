@@ -1,8 +1,12 @@
 import Button from '@components/Button';
+import CardAbsensi from '@components/CardAbsensi';
 import FormInput from '@components/FormInput';
+import { useDetailAbsensiService } from '@modules/Absensi/DetailAbsensi';
+import { useAppSlice } from '@modules/app';
 import { StackProps } from '@navigator';
 import { colors } from '@theme';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 const styles = StyleSheet.create({
   root: {
@@ -11,8 +15,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: 18,
+    fontWeight: 'bold',
     justifyContent: 'center',
   },
   buttonTitle: {
@@ -36,10 +40,11 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   menuTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
-    marginBottom: 20,
+    marginTop: 20,
+    textAlign: 'center',
   },
   menuItems: {
     flexDirection: 'row',
@@ -65,6 +70,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   form: {
+    marginVertical: 10,
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 20,
@@ -80,26 +86,101 @@ const styles = StyleSheet.create({
 });
 
 export default function DetailAbsensi({ navigation, route }: StackProps) {
+  const { user } = useAppSlice();
+  const { getDetailAbsensi } = useDetailAbsensiService();
+  const [loading, setLoading] = useState(false);
+  const [Kehadiran, setKehadiran] = useState(0);
+  const [Telat, setTelat] = useState(0);
+  const [TepatWaktu, setTepatWaktu] = useState(0);
+  const [PulangCepat, setPulangCepat] = useState(0);
+  const [TepatWaktuAbsenPulang, setTepatWaktuAbsenPulang] = useState(0);
+  const [izin, setIzin] = useState(0);
+
   const { bulan, tahun } = route.params as { bulan: string; tahun: string };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   if (!bulan) {
-    return <Text style={styles.title}>Error: Missing 'bulan' parameter</Text>;
+    return <Text style={styles.title}>Error: Bulan Tidak Ditemukan </Text>;
   }
 
   if (!tahun) {
-    return <Text style={styles.title}>Error: Missing 'tahun' parameter</Text>;
+    return <Text style={styles.title}>Error: Tahun Tidak Ditemukan </Text>;
   }
+
+  const fetchData = async () => {
+    if (loading) return;
+    setLoading(true);
+    const nikUser = user?.data.nik;
+    if (nikUser !== undefined) {
+      try {
+        const getAbsen = await getDetailAbsensi(nikUser, bulan, tahun);
+        if (getAbsen) {
+          setKehadiran(getAbsen.kehadiran);
+          setTelat(getAbsen.telat);
+          setTepatWaktu(getAbsen.tepatWaktu);
+          setPulangCepat(getAbsen.pulangCepat);
+          setTepatWaktuAbsenPulang(getAbsen.TepatWaktuAbsenPulang);
+          setIzin(getAbsen.izin);
+        } else {
+          Alert.alert('Gagal Mengambil Data', `Silahkan Login Kembali`, [
+            { text: 'OK', onPress: () => navigation.goBack() },
+          ]);
+        }
+      } catch (err) {
+        console.log('[##] preload error DetailAbsensi:', err);
+        Alert.alert('Gagal Mengambil Data', `Silahkan Login Kembali`, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      Alert.alert('Gagal Mengambil Data', `Silahkan Login Kembali`, [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+    }
+  };
+
+  const handlePress = () => {
+    // Mengosongkan nilai state
+  };
 
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
-      <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <Text style={styles.title}>Detail Absensi</Text>
-      </View>
-      <View style={styles.form}>
-        <FormInput label="Kehadiran" value={tahun} readOnly />
-        <FormInput label="Absen" value={bulan} readOnly />
-        <FormInput label="Izin / SPT" readOnly />
-        <FormInput label="Telat" readOnly />
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
+      <ScrollView>
+        <View style={{ alignItems: 'center', marginTop: 10 }}>
+          <Text style={styles.title}>Detail Absensi</Text>
+          <Text style={styles.title}> {user?.data.nama}</Text>
+        </View>
+        <CardAbsensi title="Kehadiran" description={Kehadiran.toString()} onPress={handlePress} />
+
+        <Text style={styles.menuTitle}>Absen Masuk</Text>
+        <CardAbsensi
+          title="Tepat Waktu"
+          description={TepatWaktu.toString()}
+          onPress={handlePress}
+        />
+        <CardAbsensi title="Telat" description={Telat.toString()} onPress={handlePress} />
+
+        <Text style={styles.menuTitle}>Absen Pulang</Text>
+        <CardAbsensi
+          title="Tepat Waktu"
+          description={TepatWaktuAbsenPulang.toString()}
+          onPress={handlePress}
+        />
+        <CardAbsensi
+          title="Cepat Pulang"
+          description={PulangCepat.toString()}
+          onPress={handlePress}
+        />
+        <Text style={styles.menuTitle}>Izin</Text>
+        <CardAbsensi title="SPT" description={izin.toString()} onPress={handlePress} />
+
+        {/* <View style={styles.form}> */}
         <View style={styles.buttonContainer}>
           <Button
             style={styles.button}
@@ -109,24 +190,25 @@ export default function DetailAbsensi({ navigation, route }: StackProps) {
             onPress={() => navigation.goBack()}
           />
         </View>
-      </View>
-      <View
-        style={{
-          position: 'absolute', // Mengatur posisi absolut
-          bottom: 0, // Menempatkan teks di bagian bawah layar
-          left: 0,
-          right: 0,
-          marginBottom: 20, // Jarak dari bawah layar
-          alignItems: 'center', // Menempatkan teks di tengah secara horizontal
-        }}>
-        <Text
+        {/* </View> */}
+        <View
           style={{
-            fontSize: 12,
-            color: '#000000',
+            position: 'absolute', // Mengatur posisi absolut
+            bottom: 0, // Menempatkan teks di bagian bawah layar
+            left: 0,
+            right: 0,
+            marginBottom: 20, // Jarak dari bawah layar
+            alignItems: 'center', // Menempatkan teks di tengah secara horizontal
           }}>
-          © IT RSUD HAT
-        </Text>
-      </View>
+          <Text
+            style={{
+              fontSize: 12,
+              color: '#000000',
+            }}>
+            © IT RSUD HAT
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

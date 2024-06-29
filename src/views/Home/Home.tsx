@@ -4,18 +4,17 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Image as ImageReact,
+  Image,
   Alert,
   SafeAreaView,
   StatusBar,
 } from 'react-native';
 import { StackProps } from '@navigator/stack';
-import { images } from '@theme';
+import { colors, images } from '@theme';
 import { DataPersistKeys, useDataPersist } from '@hooks';
 import { IUser, useAppSlice } from '@modules/app';
 import axios from 'axios';
 import config from '@utils/config';
-import Image from '@components/Image';
 import * as FileSystem from 'expo-file-system';
 
 const styles = StyleSheet.create({
@@ -293,7 +292,7 @@ export default function Home({ navigation }: StackProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
       <View style={styles.header}>
         <Image source={images.logo_sm} style={styles.logo} />
         <Text style={styles.headerTitle}>SIMPEG SEHAT</Text>
@@ -305,7 +304,7 @@ export default function Home({ navigation }: StackProps) {
               navigation.navigate('UserStack', { from: 'User' });
             }}>
             {statusCode === 200 && fotoUri ? (
-              <ImageReact source={{ uri: fotoUri }} style={styles.profile} />
+              <Image source={{ uri: fotoUri }} style={styles.profile} />
             ) : (
               <Image source={images.profile} style={styles.profile} />
             )}

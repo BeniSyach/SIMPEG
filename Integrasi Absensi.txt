@@ -1,0 +1,14 @@
+kehadiran : 
+absen :
+izin/SPT :
+Telat : 
+
+kehadiran: 
+- Absen masuk dan absen pulang lengkap 
+Absen 
+- tidak ada absen masuk 
+- ada absen masuk tapi tidak ada absen pulang 
+Telat 
+- apabila absen masuk dan pulang lengkap tapi absen masuknya terhitung terlambat maka di hitung 1
+Pulang lebih cepat
+- apabila absen masuk dan pulang lengkap tapi absen pulangnya lebih cepat maka dihitung 1

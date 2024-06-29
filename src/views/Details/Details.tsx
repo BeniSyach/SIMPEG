@@ -34,7 +34,7 @@ export default function Details({ navigation, route }: StackProps) {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
       <Text style={styles.title}>{`Details (from ${from})`}</Text>
       <GradientButton
         title="Go back to Home"

@@ -7,7 +7,7 @@ import config from '@utils/config';
 import { useDataPersist, DataPersistKeys } from '@hooks';
 import { LinearGradient } from 'expo-linear-gradient';
 import Image from '@components/Image';
-import { images } from '@theme';
+import { images, colors } from '@theme';
 
 const styles = StyleSheet.create({
   gradient: {
@@ -131,7 +131,7 @@ const Login = () => {
 
   return (
     <LinearGradient colors={['#a8e063', '#56ab2f']} style={styles.gradient}>
-      <StatusBar barStyle="light-content" backgroundColor="#6a51ae" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
       <View style={styles.container}>
         <View style={styles.form}>
           <View style={styles.posisi_logo}>

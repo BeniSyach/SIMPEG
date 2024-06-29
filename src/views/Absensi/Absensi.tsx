@@ -115,6 +115,7 @@ const pickerSelectStyles = StyleSheet.create({
 });
 
 type Item = {
+  key: string;
   bulan: number;
   persen: string;
 };
@@ -180,16 +181,20 @@ export default function Absensi({ navigation, route }: StackProps) {
         const getAbsen = await getAbsensi(nikUser, selectedValue);
         if (getAbsen) {
           console.log('data Absen Berhasil di ambil', getAbsen);
-          const newData = getAbsen.allAbsenMasuk.map((item: any) => ({
+          const newData = getAbsen.allAbsenMasuk.map((item: any, index: number) => ({
+            key: `item-${index}`,
             bulan: item.bulan_masuk,
             persen: item.jumlah_absen,
           }));
           setData(newData);
         } else {
-          const newData: Item[] = Array.from({ length: 1 }, (_, i) => ({
-            bulan: 0,
-            persen: 'tidak ada',
-          }));
+          const newData: Item[] = [
+            {
+              key: 'not-found', // Gunakan key unik untuk data yang tidak ditemukan
+              bulan: 0,
+              persen: 'tidak ada',
+            },
+          ];
           setData(prevData => [...prevData, ...newData]);
         }
       } catch (err) {
@@ -265,7 +270,7 @@ export default function Absensi({ navigation, route }: StackProps) {
         <FlatList
           data={data}
           renderItem={renderItem}
-          keyExtractor={item => item.persen}
+          keyExtractor={item => item.key}
           // onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
