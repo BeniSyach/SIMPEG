@@ -1,6 +1,5 @@
 import Button from '@components/Button';
 import CardAbsensi from '@components/CardAbsensi';
-import FormInput from '@components/FormInput';
 import { useDetailAbsensiService } from '@modules/Absensi/DetailAbsensi';
 import { useAppSlice } from '@modules/app';
 import { StackProps } from '@navigator';

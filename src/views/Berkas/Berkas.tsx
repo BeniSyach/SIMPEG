@@ -57,7 +57,6 @@ export default function Berkas({ navigation, route }: StackProps) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [TokenLama, setTokenLama] = useState('');
   const [isOpenAdd, setOpenAdd] = useState(false);
   const [isOpenUpdate, setOpenUpdate] = useState(false);
 
@@ -72,7 +71,6 @@ export default function Berkas({ navigation, route }: StackProps) {
     try {
       const token = await getPersistData<IUser>(DataPersistKeys.TOKEN);
       if (token) {
-        setTokenLama(token.access_token);
         console.log('User Token found:', token);
         const berkas = await getBerkas(token.access_token);
         if (berkas) {
